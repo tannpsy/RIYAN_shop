@@ -1,0 +1,208 @@
+/* Reset dan dasar */
+body, html, #root {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', sans-serif;
+  width: 100%;
+  overflow-x: hidden;
+  background-color: #fff;
+}
+
+.app {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  box-sizing: border-box;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  width: 100%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+}
+
+.logo-img {
+  width: 140px; /* diperbesar */
+  height: auto;
+  margin-right: 10px;
+}
+
+.logo-text {
+  font-size: 1.8rem;
+  font-weight: bold;
+}
+
+.logo-text .red {
+  color: #e60000;
+}
+
+/* Navigation (kiri) */
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.nav a {
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+}
+
+.icon-link .icon {
+  font-size: 1.4rem;
+  color: #333;
+}
+
+/* Tombol kanan */
+.header-right {
+  display: flex;
+  gap: 1rem;
+}
+
+.sign-in,
+.get-started {
+  padding: 0.5rem 1rem;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1rem;
+  border-radius: 5px;
+}
+
+.sign-in {
+  background-color: #003366;
+  color: white;
+}
+
+.get-started {
+  background-color: white;
+  color: black;
+  border: 1px solid #ccc;
+}
+
+/* Main content */
+.main {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2rem 4rem;
+  width: 100%;
+  flex-wrap: nowrap;
+  box-sizing: border-box;
+}
+
+.gradient-text {
+  background: linear-gradient(90deg, #00367a, #e20a16);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-size: 3.5rem;
+  font-weight: bold;
+  line-height: 1.2;
+}
+
+.hero-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.hero-text h1 {
+  font-size: 3rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.2;
+}
+
+.hero-text .blue {
+  color: #0033cc;
+}
+
+.hero-text .red {
+  color: #e60000;
+}
+
+.hero-text .purple {
+  color: #800040;
+}
+
+.see-merch {
+  padding: 0.8rem 1.5rem;
+  font-size: 1rem;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 0.5rem;
+}
+
+.hero-logo {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.hero-img {
+  max-width: 400px;
+  width: 100%;
+  height: auto;
+}
+
+/* Footer */
+.footer {
+ background: linear-gradient(to right, #002f6c, #c8102e);
+  padding: 2rem;
+  color: white;
+  border-radius: 50px 50px 0 0;
+  margin-top: 4rem;
+  width: 100%;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.footer p {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+.contact-us {
+  padding: 0.6rem 1.2rem;
+  background-color: #003366;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-weight: bold;
+  font-size: 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.social-icons {
+  margin-top: 1rem;
+  font-size: 1.5rem;
+}
+
+.social-icons .icon {
+  margin: 0 0.7rem;
+  cursor: pointer;
+}
