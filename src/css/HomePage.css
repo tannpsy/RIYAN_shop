@@ -1,4 +1,4 @@
-/* Reset dan dasar */
+
 body, html, #root {
   margin: 0;
   padding: 0;
@@ -110,7 +110,6 @@ body, html, #root {
 
 .gradient-text {
   background: linear-gradient(90deg, #00367a, #e20a16);
-  -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   font-size: 3.5rem;
   font-weight: bold;
