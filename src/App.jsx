@@ -6,6 +6,8 @@ import UserDashboard from './pages/user/UserDashboard';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import NotFound from './pages/NotFound';
 import RegisterPage from './pages/auth/RegisterPage';
+import UsersAdmin from './pages/admin/UsersAdmin';
+import AdminHome from './pages/admin/AdminHome';
 
 // Authentication component to redirect already logged in users
 const AuthRoute = ({ children }) => {
@@ -96,7 +98,10 @@ function App() {
         <ProtectedRoute role="admin">
           <AdminDashboard onLogout={handleLogout} />
         </ProtectedRoute>
-      } />
+      }>
+        <Route index element={<AdminHome />} />
+        <Route path="/admin/users" element={<UsersAdmin />} />
+      </Route>
       
       {/* Fallback for unmatched routes */}
       <Route path="*" element={<NotFound />} />
