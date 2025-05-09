@@ -1,26 +1,26 @@
-/* Dashboard.css */
-
-/* Main dashboard container */
-.dashboard-container {
+/* Layout utama */
+.dashboard-layout {
+  display: flex;
+  flex-direction: column;
   min-height: 100vh;
-  background-color: #f9fafb;
-  font-family: Arial, sans-serif;
 }
 
-/* Header styling */
-.dashboard-header {
+/* Top navbar */
+.top-navbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 2rem;
   background-color: white;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  color: white;
+  padding: 1rem 2rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  z-index: 100;
 }
 
-.dashboard-header h1 {
-  font-size: 1.5rem;
-  color: #111827;
-  margin: 0;
+.top-navbar .logo-img {
+  height: 100px;
+  weight: 100px;
+  margin-left: 30px;
 }
 
 .user-actions {
@@ -30,8 +30,8 @@
 }
 
 .user-actions span {
-  font-size: 0.875rem;
-  color: #4b5563;
+  font-size: 1rem;
+  color: black;
 }
 
 .logout-button {
@@ -40,7 +40,7 @@
   border: none;
   padding: 0.5rem 1rem;
   border-radius: 0.375rem;
-  font-size: 0.875rem;
+  font-size: 1rem;
   cursor: pointer;
   transition: background-color 0.2s;
 }
@@ -49,8 +49,47 @@
   background-color: #dc2626;
 }
 
-/* Dashboard content */
-.dashboard-content {
+/* Wrapper untuk sidebar dan konten utama */
+.main-wrapper {
+  display: flex;
+  flex: 1;
+  min-height: calc(100vh - 64px); /* dikurangi tinggi navbar */
+  background-color: #f9fafb;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 190px;
+  background-color: #1e3a8a;
+  color: white;
+  padding: 1.5rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.sidebar-nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+}
+
+.sidebar-nav li {
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  border-radius: 0.375rem;
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+.sidebar-nav li:hover {
+  background-color: #3b82f6;
+}
+
+/* Main content */
+.dashboard-container {
+  flex: 1;
   padding: 2rem;
 }
 
@@ -104,24 +143,11 @@
   margin: 0;
 }
 
-/* Admin specific styles */
-.admin-dashboard .dashboard-header {
-  background-color: #1e3a8a;
-  color: white;
-}
-
-.admin-dashboard .dashboard-header h1 {
-  color: white;
-}
-
-.admin-dashboard .user-actions span {
-  color: #e5e7eb;
-}
-
 .admin-stat .stat-number {
   color: #1e3a8a;
 }
 
+/* Admin controls section */
 .admin-controls {
   background-color: white;
   padding: 1.5rem;
@@ -157,28 +183,37 @@
   background-color: #1e40af;
 }
 
-/* Responsive adjustments */
+/* Responsive */
 @media (max-width: 768px) {
-  .dashboard-header {
+  .top-navbar {
     flex-direction: column;
     align-items: flex-start;
     gap: 1rem;
-    padding: 1rem;
   }
-  
+
   .user-actions {
     width: 100%;
     justify-content: space-between;
   }
-  
-  .dashboard-content {
+
+  .main-wrapper {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-around;
+  }
+
+  .dashboard-container {
     padding: 1rem;
   }
-  
+
   .dashboard-stats {
     grid-template-columns: 1fr;
   }
-  
+
   .admin-buttons {
     grid-template-columns: 1fr;
   }
