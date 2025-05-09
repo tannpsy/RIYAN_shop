@@ -1,96 +1,126 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Lock, User } from 'lucide-react';
+import { Mail, Lock } from 'lucide-react';
+import { supabase } from '../../lib/supabase';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import '../../css/Auth.css';
 
 export default function LoginPage() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [formData, setFormData] = useState({ email: '', password: '' });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
-  
-  // Mock user data - in a real app, this would be your API call
-  const users = {
-    user: { username: 'user', password: '1234', role: 'user' },
-    admin: { username: 'admin', password: 'admin', role: 'admin' },
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
-  // Check if user is already logged in
-  useEffect(() => {
-    const userRole = localStorage.getItem('role');
-    if (userRole) {
-      // Redirect to appropriate dashboard
-      navigate(userRole === 'admin' ? '/admin' : '/home');
-    }
-  }, [navigate]);
-
-  const handleLogin = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
     setError('');
-    
-    // Simulate API request
-    setTimeout(() => {
-      const user = users[username];
-      
-      if (user && user.password === password) {
-        // Save authentication state
-        localStorage.setItem('role', user.role);
-        
-        // Redirect based on role
-        navigate(user.role === 'admin' ? '/admin' : '/home');
-      } else {
-        setError('Invalid username or password');
+    setIsLoading(true);
+
+    try {
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+        email: formData.email,
+        password: formData.password,
+      });
+
+      if (signInError) {
+        setError(signInError.message);
         setIsLoading(false);
+        return;
       }
-    }, 800);
+
+      const user = signInData.user;
+
+      if (!user) {
+        setError('Login failed: no user returned');
+        setIsLoading(false);
+        return;
+      }
+
+      const { data: userInfo, error: fetchError } = await supabase
+        .from('users')
+        .select('fullname, role')
+        .eq('uid', user.id)
+        .single();
+
+      if (fetchError) {
+        setError('Failed to fetch user info: ' + fetchError.message);
+        setIsLoading(false);
+        return;
+      }
+
+      const { fullname, role } = userInfo;
+
+      toast.success(`Welcome, ${fullname}`, {
+        position: 'top-center',
+        autoClose: 1500,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        theme: 'colored',
+      });
+
+      setTimeout(() => {
+        if (role === 'admin') {
+          navigate('/admin');
+        } else {
+          navigate('/home');
+        }
+      }, 1600);
+
+    } catch (err) {
+      setError('Unexpected error during login.');
+    }
+
+    setIsLoading(false);
   };
 
   return (
     <div className="auth-container">
+      <ToastContainer />
       <div className="auth-card">
         <div className="auth-header">
           <h2 className="auth-title">Sign in to your account</h2>
-          <p className="auth-subtitle">Enter your credentials to access your dashboard</p>
+          <p className="auth-subtitle">Enter your email and password to continue</p>
         </div>
 
-        <form onSubmit={handleLogin}>
+        <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="username" className="form-label">
-              Username
-            </label>
+            <label htmlFor="email" className="form-label">Email Address</label>
             <div className="input-wrapper">
-              <div className="icon-container">
-                <User size={20} color="#9ca3af" />
-              </div>
+              <div className="icon-container"><Mail size={20} color="#9ca3af" /></div>
               <input
-                id="username"
-                name="username"
-                type="text"
-                value={username}
-                onChange={e => setUsername(e.target.value)}
+                id="email"
+                name="email"
+                type="email"
+                value={formData.email}
+                onChange={handleChange}
                 className="input-field"
-                placeholder="Enter your username"
+                placeholder="Enter your email"
                 required
               />
             </div>
           </div>
 
           <div className="form-group">
-            <label htmlFor="password" className="form-label">
-              Password
-            </label>
+            <label htmlFor="password" className="form-label">Password</label>
             <div className="input-wrapper">
-              <div className="icon-container">
-                <Lock size={20} color="#9ca3af" />
-              </div>
+              <div className="icon-container"><Lock size={20} color="#9ca3af" /></div>
               <input
                 id="password"
                 name="password"
                 type="password"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
+                value={formData.password}
+                onChange={handleChange}
                 className="input-field"
                 placeholder="Enter your password"
                 required
@@ -98,52 +128,20 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {error && (
-            <div className="error-message">
-              {error}
-            </div>
-          )}
+          {error && <div className="error-message">{error}</div>}
 
-          <div className="flex-row">
-            <div className="checkbox-container">
-              <input
-                id="remember-me"
-                name="remember-me"
-                type="checkbox"
-                className="checkbox"
-              />
-              <label htmlFor="remember-me" className="checkbox-label">
-                Remember me
-              </label>
-            </div>
-
-            <div>
-              <a href="#" className="auth-link">
-                Forgot password?
-              </a>
-            </div>
-          </div>
-
-          <button
-            type="submit"
-            className="auth-button"
-            disabled={isLoading}
-          >
-            {isLoading ? 'Signing in...' : 'Sign in'}
+          <button type="submit" className="auth-button" disabled={isLoading}>
+            {isLoading ? 'Logging in...' : 'Sign in'}
           </button>
         </form>
 
         <div className="divider">
           <div className="divider-line"></div>
-          <span className="divider-text">
-            Don't have an account?
-          </span>
+          <span className="divider-text">Don’t have an account?</span>
         </div>
 
         <Link to="/register" style={{ textDecoration: 'none' }}>
-          <button className="secondary-button">
-            Sign up
-          </button>
+          <button className="secondary-button">Create Account</button>
         </Link>
       </div>
     </div>

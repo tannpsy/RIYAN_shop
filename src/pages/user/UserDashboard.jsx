@@ -1,36 +1,71 @@
 import { useEffect, useState } from 'react';
-import AuthService from '../../services/AuthService';
+import { useNavigate } from 'react-router-dom';
+import { supabase } from '../../lib/supabase';
 import '../../css/Dashboard.css';
 
-
 export default function UserDashboard() {
-  const [username, setUsername] = useState('');
-  
+  const [userData, setUserData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
+
   useEffect(() => {
-    // Get the username when the component mounts
-    setUsername(AuthService.getUsername());
-  }, []);
-  
-  const handleLogout = () => {
-    AuthService.logout();
+    const fetchUserData = async () => {
+      const {
+        data: { user },
+        error: userError
+      } = await supabase.auth.getUser();
+
+      if (userError || !user) {
+        navigate('/login');
+        return;
+      }
+
+      const { data: userDetails, error: fetchError } = await supabase
+        .from('users')
+        .select('*')
+        .eq('uid', user.id)
+        .single();
+
+      if (fetchError || !userDetails) {
+        console.error('Failed to fetch user details:', fetchError);
+        navigate('/login');
+        return;
+      }
+
+      setUserData(userDetails);
+      setIsLoading(false);
+    };
+
+    fetchUserData();
+  }, [navigate]);
+
+  const handleLogout = async () => {
+    setIsLoading(true);
+    await supabase.auth.signOut();
+    localStorage.removeItem('role'); // optional, depending on your app
+    navigate('/login');
   };
-  
+
+  if (isLoading) return <div>Loading...</div>;
+
   return (
     <div className="dashboard-container">
       <header className="dashboard-header">
         <h1>User Dashboard</h1>
         <div className="user-actions">
-          <span>Welcome, {username}</span>
-          <button onClick={handleLogout} className="logout-button">Logout</button>
+          <span>Welcome, {userData?.username || 'User'}</span>
+          <button onClick={handleLogout} className="logout-button">
+            Logout
+          </button>
         </div>
       </header>
-      
+
       <main className="dashboard-content">
         <div className="dashboard-card">
-          <h2>Welcome to Your User Dashboard</h2>
-          <p>This is a protected route accessible only to authenticated users with the role "user".</p>
+          <h2>Hello {userData.fullname}!</h2>
+          <p>This is a protected dashboard only for users with the role <strong>"user"</strong>.</p>
         </div>
-        
+
         <div className="dashboard-stats">
           <div className="stat-card">
             <h3>Your Projects</h3>
