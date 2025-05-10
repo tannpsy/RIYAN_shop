@@ -1,12 +1,25 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import UsersAdmin from './UsersAdmin'; // Assuming this component exists
-import { supabase } from '../../lib/supabase'; // Import supabase
+import { useNavigate, useLocation } from 'react-router-dom'; // Add useLocation
+import UsersAdmin from './UsersAdmin';
+import { supabase } from '../../lib/supabase';
+import Products from './Products';
 
 export default function AdminDashboard() {
   const [activePage, setActivePage] = useState('dashboard');
   const [totalUsers, setTotalUsers] = useState(0);
   const navigate = useNavigate();
+  const location = useLocation(); // Initialize useLocation
+
+  // Sync activePage with the current route
+  useEffect(() => {
+    if (location.pathname === '/admin/users') {
+      setActivePage('users');
+    } else if (location.pathname === '/admin/products') {
+      setActivePage('products');
+    } else {
+      setActivePage('dashboard');
+    }
+  }, [location]);
 
   // Fetch total users count
   useEffect(() => {
@@ -14,19 +27,19 @@ export default function AdminDashboard() {
       try {
         const { data, error } = await supabase
           .from('users')
-          .select('id', { count: 'exact' }); // Use count: 'exact' to get total number of users
+          .select('id', { count: 'exact' });
 
         if (error) {
           throw error;
         }
 
-        setTotalUsers(data.length); // Set the total user count
+        setTotalUsers(data.length);
       } catch (error) {
         console.error("Error fetching total users:", error.message);
       }
     };
 
-    fetchTotalUsers(); // Fetch total users count when component mounts
+    fetchTotalUsers();
   }, []);
 
   const renderMainContent = () => {
@@ -41,17 +54,19 @@ export default function AdminDashboard() {
               </div>
               <div className="stat-card admin-stat fixed-width">
                 <h3>Total Users</h3>
-                <p className="stat-number">{totalUsers}</p> {/* Display dynamic total users */}
+                <p className="stat-number">{totalUsers}</p>
               </div>
             </div>
             <div className="dashboard-card">
               <h2>User Management</h2>
-              <UsersAdmin setTotalUsers={setTotalUsers} /> {/* Pass setTotalUsers function to UsersAdmin */}
+              <UsersAdmin setTotalUsers={setTotalUsers} />
             </div>
           </>
         );
       case 'users':
         return <UsersAdmin setTotalUsers={setTotalUsers} />;
+      case 'products':
+        return <Products />;
       default:
         return <div>Page not found</div>;
     }
@@ -59,11 +74,12 @@ export default function AdminDashboard() {
 
   const handleSidebarClick = (page) => {
     setActivePage(page);
-    // Navigate to the corresponding route
     if (page === 'dashboard') {
       navigate('/admin');
     } else if (page === 'users') {
       navigate('/admin/users');
+    } else if (page === 'products') {
+      navigate('/admin/products');
     }
   };
 
@@ -84,7 +100,7 @@ export default function AdminDashboard() {
             <ul>
               <li onClick={() => handleSidebarClick('dashboard')}>Dashboard</li>
               <li onClick={() => handleSidebarClick('users')}>Users</li>
-              <li>Products</li>
+              <li onClick={() => handleSidebarClick('products')}>Products</li>
               <li>Reviews</li>
             </ul>
           </nav>
