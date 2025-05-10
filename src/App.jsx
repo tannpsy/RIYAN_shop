@@ -9,6 +9,8 @@ import UsersAdmin from './pages/admin/UsersAdmin';
 import AdminHome from './pages/admin/AdminHome';
 import ItemList from './pages/user/item/ItemsPage';
 import ItemDetailPage from './pages/user/item/itemDetailPage';
+import Products from './pages/admin/Products';
+
 
 function App() {
   return (
@@ -26,6 +28,12 @@ function App() {
         <Route path="users" element={<UsersAdmin />} />
       </Route>
       
+      <Route path="/admin" element={<AdminDashboard />}>
+        <Route index element={<AdminHome />} />
+        <Route path="users" element={<UsersAdmin />} />
+        <Route path="products" element={<Products />} />
+      </Route>
+
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
