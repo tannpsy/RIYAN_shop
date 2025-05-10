@@ -16,15 +16,15 @@ const NavBar = () => {
           <a href="#" className="icon-link">
             <FaShoppingCart className="icon" />
           </a>
-          <button onClick={() => navigate('/items')}>Items</button>
+          <button className="items" onClick={() => navigate('/items')}>Items</button>
         </nav>
       </div>
 
       <div className="header-right">
-        <button className="sign-in" onClick={() => navigate('/admin')}>
+        <button className="sign-in" onClick={() => navigate('/login')}>
           Sign In
         </button>
-        <button className="get-started">Get Started</button>
+        <button className="get-started" onClick={() => navigate('/register')}>Get Started</button>
       </div>
     </header>
   );

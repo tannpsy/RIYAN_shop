@@ -10,7 +10,6 @@ import AdminHome from './pages/admin/AdminHome';
 import Products from './pages/admin/Products';
 import ItemList from './pages/user/item/ItemsPage';
 import ItemDetailPage from './pages/user/item/itemDetailPage';
-import Products from './pages/admin/Products';
 
 
 function App() {
@@ -36,13 +35,6 @@ function App() {
         <Route path="products" element={<Products />} />
         <Route path="users" element={<UsersAdmin />} />
       </Route>
-      
-      <Route path="/admin" element={<AdminDashboard />}>
-        <Route index element={<AdminHome />} />
-        <Route path="users" element={<UsersAdmin />} />
-        <Route path="products" element={<Products />} />
-      </Route>
-
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
