@@ -1,19 +1,33 @@
-import { useEffect, useState } from 'react';
-import AuthService from '../../services/AuthService';
-import '../../css/Dashboard.css';
-import UsersAdmin from './UsersAdmin'; // Ensure path is correct
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import UsersAdmin from './UsersAdmin'; // Assuming this component exists
+import { supabase } from '../../lib/supabase'; // Import supabase
 
 export default function AdminDashboard() {
-  const [username, setUsername] = useState('');
   const [activePage, setActivePage] = useState('dashboard');
+  const [totalUsers, setTotalUsers] = useState(0);
+  const navigate = useNavigate();
 
+  // Fetch total users count
   useEffect(() => {
-    setUsername(AuthService.getUsername());
-  }, []);
+    const fetchTotalUsers = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('users')
+          .select('id', { count: 'exact' }); // Use count: 'exact' to get total number of users
 
-  const handleLogout = () => {
-    AuthService.logout();
-  };
+        if (error) {
+          throw error;
+        }
+
+        setTotalUsers(data.length); // Set the total user count
+      } catch (error) {
+        console.error("Error fetching total users:", error.message);
+      }
+    };
+
+    fetchTotalUsers(); // Fetch total users count when component mounts
+  }, []);
 
   const renderMainContent = () => {
     switch (activePage) {
@@ -23,23 +37,33 @@ export default function AdminDashboard() {
             <div className="dashboard-header-row">
               <div className="dashboard-card flex-grow">
                 <h2>Admin Control Panel</h2>
-                <p>This is a protected route accessible only to authenticated users with the role "admin".</p>
+                <p>This is a static admin panel accessible without authentication.</p>
               </div>
               <div className="stat-card admin-stat fixed-width">
                 <h3>Total Users</h3>
-                <p className="stat-number">124</p>
+                <p className="stat-number">{totalUsers}</p> {/* Display dynamic total users */}
               </div>
             </div>
             <div className="dashboard-card">
               <h2>User Management</h2>
-              <UsersAdmin />
+              <UsersAdmin setTotalUsers={setTotalUsers} /> {/* Pass setTotalUsers function to UsersAdmin */}
             </div>
           </>
         );
       case 'users':
-        return <UsersAdmin />;
+        return <UsersAdmin setTotalUsers={setTotalUsers} />;
       default:
         return <div>Page not found</div>;
+    }
+  };
+
+  const handleSidebarClick = (page) => {
+    setActivePage(page);
+    // Navigate to the corresponding route
+    if (page === 'dashboard') {
+      navigate('/admin');
+    } else if (page === 'users') {
+      navigate('/admin/users');
     }
   };
 
@@ -50,8 +74,7 @@ export default function AdminDashboard() {
           <img src="/logo3.png" alt="Logo" className="logo-img" />
         </div>
         <div className="user-actions">
-          <span>Welcome, {username} (Admin)</span>
-          <button onClick={handleLogout} className="logout-button">Logout</button>
+          <span>Welcome, Admin</span>
         </div>
       </header>
 
@@ -59,8 +82,8 @@ export default function AdminDashboard() {
         <aside className="sidebar">
           <nav className="sidebar-nav">
             <ul>
-              <li onClick={() => setActivePage('dashboard')}>Dashboard</li>
-              <li onClick={() => setActivePage('users')}>Users</li>
+              <li onClick={() => handleSidebarClick('dashboard')}>Dashboard</li>
+              <li onClick={() => handleSidebarClick('users')}>Users</li>
               <li>Products</li>
               <li>Reviews</li>
             </ul>

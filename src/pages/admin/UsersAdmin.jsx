@@ -1,23 +1,35 @@
-import { useState } from 'react';
-import '../../css/UsersAdmin.css'; // Opsional, untuk styling tambahan
+import { useEffect, useState } from 'react';
+import { supabase } from '../../lib/supabase'; // Ensure supabase is imported
+import '../../css/UsersAdmin.css'; // Optional, for styling
 
-export default function UsersAdmin() {
-  const [users, setUsers] = useState([
-    { id: 1, name: 'Alice Johnson', email: 'alice@example.com', role: 'User' },
-    { id: 2, name: 'Bob Smith', email: 'bob@example.com', role: 'Admin' },
-    { id: 3, name: 'Charlie Brown', email: 'charlie@example.com', role: 'User' },
-  ]);
+export default function UsersAdmin({ setTotalUsers }) {
+  const [users, setUsers] = useState([]);
 
-  const handleEdit = (id) => {
-    alert(`Edit user with ID: ${id}`);
-    // Tambahkan logika modal/form edit di sini
-  };
+  // Fetch data from the 'users' table
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('users') // Fetch data from 'users' table
+          .select('id, fullname, email, role'); // Select necessary columns
 
-  const handleDelete = (id) => {
-    if (window.confirm('Are you sure you want to delete this user?')) {
-      setUsers(users.filter(user => user.id !== id));
-    }
-  };
+        if (error) {
+          throw error;
+        }
+
+        setUsers(data); // Set the users to state
+
+        // Update the total user count in AdminDashboard
+        if (setTotalUsers) {
+          setTotalUsers(data.length);
+        }
+      } catch (error) {
+        console.error("Error fetching users:", error.message);
+      }
+    };
+
+    fetchUsers(); // Fetch users when component mounts
+  }, [setTotalUsers]);
 
   return (
     <div className="dashboard-card">
@@ -29,7 +41,6 @@ export default function UsersAdmin() {
             <th>Name</th>
             <th>Email</th>
             <th>Role</th>
-            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -37,17 +48,13 @@ export default function UsersAdmin() {
             users.map(user => (
               <tr key={user.id}>
                 <td>{user.id}</td>
-                <td>{user.name}</td>
+                <td>{user.fullname}</td>
                 <td>{user.email}</td>
                 <td>{user.role}</td>
-                <td>
-                  <button className="edit-btn" onClick={() => handleEdit(user.id)}>Edit</button>
-                  <button className="delete-btn" onClick={() => handleDelete(user.id)}>Delete</button>
-                </td>
               </tr>
             ))
           ) : (
-            <tr><td colSpan="5">No users found.</td></tr>
+            <tr><td colSpan="4">No users found.</td></tr>
           )}
         </tbody>
       </table>
