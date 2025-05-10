@@ -25,8 +25,6 @@ const ItemList = () => {
           </button>
         </div>
       ))}
-      
-      {/* This is where the nested route (ItemDetailPage) will render */}
       <Outlet />
     </div>
   );
