@@ -20,7 +20,6 @@ export default function HomePage() {
           </div>
           <nav className="nav">
             <a href="#">Home</a>
-            <button onClick={() => navigate('/login')}>Login</button>
             <a href="#" className="icon-link">
               <FaShoppingCart className="icon" />
             </a>
@@ -28,7 +27,7 @@ export default function HomePage() {
         </div>
 
         <div className="header-right">
-          <button className="sign-in" >Sign In</button>
+          <button className="sign-in" onClick={() => navigate('/admin')}>Sign In</button>
           <button className="get-started">Get Started</button>
         </div>
       </header>
