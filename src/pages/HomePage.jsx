@@ -7,30 +7,14 @@ import {
   FaEnvelope,
 } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import ItemList from '../components/ItemButton';
+import ItemList from './user/item/ItemsPage';
+import NavBar from '../components/NavBar';
 
 export default function HomePage() {
   const navigate = useNavigate();
   return (
     <div className="app">
-      <header className="header">
-        <div className="header-left">
-          <div className="logo">
-            <img src="/logo3.png" alt="PresUniv" className="logo-img" />
-          </div>
-          <nav className="nav">
-            <a href="#">Home</a>
-            <a href="#" className="icon-link">
-              <FaShoppingCart className="icon" />
-            </a>
-          </nav>
-        </div>
-
-        <div className="header-right">
-          <button className="sign-in" onClick={() => navigate('/admin')}>Sign In</button>
-          <button className="get-started">Get Started</button>
-        </div>
-      </header>
+      <NavBar/>
 
       <main className="main">
         <div className="hero-text">

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Outlet } from 'react-router-dom';
 
 const mockItems = [
   { id: '101', name: 'University Hoodie' },
@@ -11,7 +11,7 @@ const ItemList = () => {
   const navigate = useNavigate();
 
   const handleViewDetail = (itemId) => {
-    navigate(`/item/${itemId}`);
+    navigate(`/items/${itemId}`);
   };
 
   return (
@@ -25,6 +25,9 @@ const ItemList = () => {
           </button>
         </div>
       ))}
+      
+      {/* This is where the nested route (ItemDetailPage) will render */}
+      <Outlet />
     </div>
   );
 };

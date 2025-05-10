@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
+import NavBar from '../../components/NavBar.jsx';
 import '../../css/Dashboard.css';
 
 export default function UserDashboard() {
@@ -50,6 +51,7 @@ export default function UserDashboard() {
 
   return (
     <div className="dashboard-container">
+      <NavBar/>
       <header className="dashboard-header">
         <h1>User Dashboard</h1>
         <div className="user-actions">
