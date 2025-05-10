@@ -5,13 +5,12 @@ body, html, #root {
   font-family: 'Segoe UI', sans-serif;
   width: 100%;
   overflow-x: hidden;
-  background-color: #fff;
+  background-color: #f6f7fb;
 }
 
 .app {
   max-width: 1600px;
   margin: 0 auto;
-  padding: 0 2rem;
   box-sizing: border-box;
 }
 
@@ -110,11 +109,14 @@ body, html, #root {
 
 .gradient-text {
   background: linear-gradient(90deg, #00367a, #e20a16);
+  background-clip: text;
+  -webkit-background-clip: text; 
   -webkit-text-fill-color: transparent;
   font-size: 3.5rem;
   font-weight: bold;
   line-height: 1.2;
 }
+
 
 .hero-text {
   flex: 1;
@@ -143,16 +145,6 @@ body, html, #root {
   color: #800040;
 }
 
-.see-merch {
-  padding: 0.8rem 1.5rem;
-  font-size: 1rem;
-  background-color: white;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  cursor: pointer;
-  margin-top: 0.5rem;
-}
-
 .hero-logo {
   flex: 1;
   display: flex;
@@ -164,6 +156,15 @@ body, html, #root {
   width: 100%;
   height: auto;
 }
+
+.enhanced-text {
+  color: #002f6c;
+  font-size: 1.25rem; 
+  font-weight: 600;   
+  font-family: 'Segoe UI', 'Roboto', sans-serif; 
+  max-width: 600px;
+}
+
 
 /* Footer */
 .footer {

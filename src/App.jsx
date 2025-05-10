@@ -8,6 +8,8 @@ import NotFound from './pages/NotFound';
 import RegisterPage from './pages/auth/RegisterPage';
 import UsersAdmin from './pages/admin/UsersAdmin';
 import AdminHome from './pages/admin/AdminHome';
+import ItemDetailPage from './pages/user/itemDetalPage';
+import ItemList from './components/ItemButton';
 
 // Authentication component to redirect already logged in users
 const AuthRoute = ({ children }) => {
@@ -92,6 +94,16 @@ function App() {
       <Route path="/home" element={
         <ProtectedRoute role="user">
           <UserDashboard onLogout={handleLogout} />
+        </ProtectedRoute>
+      } />
+      <Route path="/items" element={
+        <ProtectedRoute role="user">
+          <ItemList />
+        </ProtectedRoute>
+      } />
+      <Route path="/item/:itemId" element={
+      <ProtectedRoute role="user">
+        <ItemDetailPage />
         </ProtectedRoute>
       } />
       <Route path="/admin" element={
