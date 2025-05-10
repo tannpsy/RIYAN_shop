@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import NavBar from '../../components/NavBar.jsx';
+import Footer from '../../components/Footer.jsx'
 import '../../css/Dashboard.css';
 
 export default function UserDashboard() {
@@ -83,6 +84,7 @@ export default function UserDashboard() {
           </div>
         </div>
       </main>
+      <Footer/>
     </div>
   );
 }
