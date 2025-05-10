@@ -1,20 +1,41 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
-import { v4 as uuidv4 } from 'uuid'; // Ensure this package is installed
 import '../../css/Products.css';
 
 export default function Products() {
   const [products, setProducts] = useState([]);
-  const [newProduct, setNewProduct] = useState({ name: '', price: ''});
+  const [newProduct, setNewProduct] = useState({ name: '', price: '', description: '' });
   const [showAddForm, setShowAddForm] = useState(false);
+  const [editingProduct, setEditingProduct] = useState(null); // store product being edited
 
   useEffect(() => {
     fetchProducts();
   }, []);
 
+  const formatRupiah = (value) => {
+    const number = value.replace(/[^,\d]/g, '').toString();
+    const split = number.split(',');
+    let rupiah = split[0].length % 3;
+    let formatted = split[0].substr(0, rupiah);
+    const thousands = split[0].substr(rupiah).match(/\d{3}/gi);
+
+    if (thousands) {
+      const separator = rupiah ? '.' : '';
+      formatted += separator + thousands.join('.');
+    }
+
+    formatted = split[1] !== undefined ? formatted + ',' + split[1] : formatted;
+    return 'Rp' + formatted;
+  };
+
+  const unformatRupiah = (value) => {
+    return value.replace(/[^0-9]/g, '');
+  };
+
+
   const fetchProducts = async () => {
     try {
-      const { data, error } = await supabase.from('products').select('*');
+      const { data, error } = await supabase.from('items').select('*');
       if (error) throw error;
       setProducts(data);
     } catch (err) {
@@ -23,32 +44,33 @@ export default function Products() {
   };
 
   const addProduct = async () => {
-        try {
-            if (!newProduct.name || !newProduct.price) {
-            alert("Please fill all required fields.");
-            return;
-            }
+    try {
+      if (!newProduct.name || !newProduct.price || !newProduct.description) {
+        alert("Please fill all required fields.");
+        return;
+      }
 
-            const { error } = await supabase.from('products').insert([{
-            uid: uuidv4(),
-            name: newProduct.name.trim(),
-            price: newProduct.price.trim(),
-            }]);
-
-            if (error) throw error;
-
-            setNewProduct({ name: '', price: '' });
-            setShowAddForm(false);
-            fetchProducts();
-        } catch (err) {
-            alert('Failed to add product: ' + err.message);
+      const { error } = await supabase.from('items').insert([
+        {
+          name: newProduct.name.trim(),
+          price: newProduct.price.trim(),
+          description: newProduct.description.trim(),
         }
-    };
+      ]);
 
+      if (error) throw error;
+
+      setNewProduct({ name: '', price: '', description: '' });
+      setShowAddForm(false);
+      fetchProducts();
+    } catch (err) {
+      alert('Failed to add product: ' + err.message);
+    }
+  };
 
   const deleteProduct = async (uid) => {
     try {
-      const { error } = await supabase.from('products').delete().eq('uid', uid);
+      const { error } = await supabase.from('items').delete().eq('uid', uid);
       if (error) throw error;
       fetchProducts();
     } catch (err) {
@@ -56,25 +78,28 @@ export default function Products() {
     }
   };
 
-  const updateProduct = async (uid, key, value) => {
-        try {
-            let updateData = {};
+  const startEditing = (product) => {
+    setEditingProduct({ ...product }); // create a copy to edit
+  };
 
-            if (key === 'category') {
-            updateData[key] = [value.trim()];
-            } else {
-            updateData[key] = value;
-            }
+  const cancelEditing = () => {
+    setEditingProduct(null);
+  };
 
-            const { error } = await supabase.from('products').update(updateData).eq('uid', uid);
-            if (error) throw error;
+  const saveEdit = async () => {
+    try {
+      const { uid, name, price, description } = editingProduct;
+      const { error } = await supabase.from('items')
+        .update({ name, price, description })
+        .eq('uid', uid);
+      if (error) throw error;
 
-            fetchProducts();
-        } catch (err) {
-            alert(`Failed to update ${key}: ${err.message}`);
-        }
-    };
-
+      setEditingProduct(null);
+      fetchProducts();
+    } catch (err) {
+      alert('Failed to save product changes: ' + err.message);
+    }
+  };
 
   return (
     <div className="dashboard-card">
@@ -102,9 +127,24 @@ export default function Products() {
               type="text"
               placeholder="Enter price"
               value={newProduct.price}
-              onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })}
+              onChange={(e) =>
+                setNewProduct({
+                  ...newProduct,
+                  price: formatRupiah(unformatRupiah(e.target.value))
+                })
+              }
             />
 
+
+            <label>Description*</label>
+            <textarea
+              placeholder="Enter description"
+              value={newProduct.description}
+              onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })}
+            />
+
+            <label>Category</label>
+            <input type="text" value="Hoodie" disabled />
 
             <div className="modal-buttons">
               <button onClick={addProduct} className="btn-submit">Submit</button>
@@ -120,6 +160,8 @@ export default function Products() {
             <th>UID</th>
             <th>Name</th>
             <th>Price</th>
+            <th>Description</th>
+            <th>Category</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -128,32 +170,81 @@ export default function Products() {
             products.map((product) => (
               <tr key={product.uid}>
                 <td>{product.uid}</td>
+
                 <td>
-                  <input
-                    type="text"
-                    value={product.name}
-                    onChange={(e) => updateProduct(product.uid, 'name', e.target.value)}
-                    className="inline-input"
-                  />
-                </td>
-                <td>
-                  <input
-                    type="text"
-                    value={product.price}
-                    onChange={(e) => updateProduct(product.uid, 'price', e.target.value)}
-                    className="inline-input"
-                  />
+                  {editingProduct?.uid === product.uid ? (
+                    <input
+                      type="text"
+                      value={editingProduct.name}
+                      onChange={(e) =>
+                        setEditingProduct({ ...editingProduct, name: e.target.value })
+                      }
+                      className="inline-input"
+                    />
+                  ) : (
+                    product.name
+                  )}
                 </td>
 
                 <td>
-                  <button className="btn-delete" onClick={() => deleteProduct(product.uid)}>
-                    Delete
-                  </button>
+                  {editingProduct?.uid === product.uid ? (
+                    <input
+                      type="text"
+                      value={editingProduct.price}
+                      onChange={(e) =>
+                        setEditingProduct({
+                          ...editingProduct,
+                          price: formatRupiah(unformatRupiah(e.target.value))
+                        })
+                      }
+                      className="inline-input"
+                    />
+
+                  ) : (
+                    product.price
+                  )}
+                </td>
+
+                <td>
+                  {editingProduct?.uid === product.uid ? (
+                    <input
+                      type="text"
+                      value={editingProduct.description}
+                      onChange={(e) =>
+                        setEditingProduct({ ...editingProduct, description: e.target.value })
+                      }
+                      className="inline-input"
+                    />
+                  ) : (
+                    product.description
+                  )}
+                </td>
+
+                <td>
+                  <input type="text" value="Hoodie" disabled className="inline-input" />
+                </td>
+
+                <td>
+                  {editingProduct?.uid === product.uid ? (
+                    <>
+                      <button className="btn-submit" onClick={saveEdit}>Save</button>
+                      <button className="btn-cancel" onClick={cancelEditing}>Cancel</button>
+                    </>
+                  ) : (
+                    <>
+                      <button className="btn-edit" onClick={() => startEditing(product)}>
+                        Edit
+                      </button>
+                      <button className="btn-delete" onClick={() => deleteProduct(product.uid)}>
+                        Delete
+                      </button>
+                    </>
+                  )}
                 </td>
               </tr>
             ))
           ) : (
-            <tr><td colSpan="5">No products found.</td></tr>
+            <tr><td colSpan="6">No products found.</td></tr>
           )}
         </tbody>
       </table>

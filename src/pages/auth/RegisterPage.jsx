@@ -90,7 +90,6 @@ export default function RegisterPage() {
             fullname: formData.fullName,
             username: formData.username,
             role: 'user',
-            cart: [],
           },
         ]);
 
