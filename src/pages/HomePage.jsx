@@ -9,6 +9,8 @@ import {
 import { useNavigate } from 'react-router-dom';
 import ItemList from './user/item/ItemsPage';
 import NavBar from '../components/NavBar';
+import Footer from '../components/Footer';
+
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -33,17 +35,7 @@ export default function HomePage() {
         <ItemList />
       </div>
 
-      <footer className="footer">
-        <p>Don't See What Are You Looking For?</p>
-        <button className="contact-us">
-          <FaEnvelope className="icon" /> Contact Us
-        </button>
-        <div className="social-icons">
-          <FaLinkedin className="icon" />
-          <FaInstagram className="icon" />
-          <FaPhone className="icon" />
-        </div>
-      </footer>
+      <Footer/>
     </div>
   );
 }

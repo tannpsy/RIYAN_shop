@@ -1,12 +1,25 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '../../lib/supabase';
+import { db, storage } from '../../lib/firebase';
+import {
+  collection,
+  addDoc,
+  getDocs,
+  deleteDoc,
+  updateDoc,
+  doc
+} from 'firebase/firestore';
+import {
+  ref,
+  uploadBytes,
+  getDownloadURL
+} from 'firebase/storage';
 import '../../css/Products.css';
 
 export default function Products() {
   const [products, setProducts] = useState([]);
-  const [newProduct, setNewProduct] = useState({ name: '', price: '', description: '' });
+  const [newProduct, setNewProduct] = useState({ name: '', price: '', description: '', image: null });
   const [showAddForm, setShowAddForm] = useState(false);
-  const [editingProduct, setEditingProduct] = useState(null); // store product being edited
+  const [editingProduct, setEditingProduct] = useState(null);
 
   useEffect(() => {
     fetchProducts();
@@ -28,39 +41,43 @@ export default function Products() {
     return 'Rp' + formatted;
   };
 
-  const unformatRupiah = (value) => {
-    return value.replace(/[^0-9]/g, '');
-  };
-
+  const unformatRupiah = (value) => value.replace(/[^0-9]/g, '');
 
   const fetchProducts = async () => {
     try {
-      const { data, error } = await supabase.from('items').select('*');
-      if (error) throw error;
-      setProducts(data);
+      const querySnapshot = await getDocs(collection(db, 'items'));
+      const productsData = querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+      setProducts(productsData);
     } catch (err) {
       console.error("Error fetching products:", err.message);
     }
   };
 
+  const uploadImage = async (file) => {
+    const fileName = `${Date.now()}-${file.name}`;
+    const storageRef = ref(storage, `product-images/${fileName}`);
+    await uploadBytes(storageRef, file);
+    return await getDownloadURL(storageRef);
+  };
+
   const addProduct = async () => {
     try {
-      if (!newProduct.name || !newProduct.price || !newProduct.description) {
-        alert("Please fill all required fields.");
+      if (!newProduct.name || !newProduct.price || !newProduct.description || !newProduct.image) {
+        alert("Please fill all required fields and upload an image.");
         return;
       }
 
-      const { error } = await supabase.from('items').insert([
-        {
-          name: newProduct.name.trim(),
-          price: newProduct.price.trim(),
-          description: newProduct.description.trim(),
-        }
-      ]);
+      const imageUrl = await uploadImage(newProduct.image);
 
-      if (error) throw error;
+      await addDoc(collection(db, 'items'), {
+        name: newProduct.name.trim(),
+        price: newProduct.price.trim(),
+        description: newProduct.description.trim(),
+        image: imageUrl,
+        category: 'Hoodie'
+      });
 
-      setNewProduct({ name: '', price: '', description: '' });
+      setNewProduct({ name: '', price: '', description: '', image: null });
       setShowAddForm(false);
       fetchProducts();
     } catch (err) {
@@ -68,10 +85,9 @@ export default function Products() {
     }
   };
 
-  const deleteProduct = async (uid) => {
+  const deleteProduct = async (id) => {
     try {
-      const { error } = await supabase.from('items').delete().eq('uid', uid);
-      if (error) throw error;
+      await deleteDoc(doc(db, 'items', id));
       fetchProducts();
     } catch (err) {
       console.error("Error deleting product:", err.message);
@@ -79,7 +95,7 @@ export default function Products() {
   };
 
   const startEditing = (product) => {
-    setEditingProduct({ ...product }); // create a copy to edit
+    setEditingProduct({ ...product });
   };
 
   const cancelEditing = () => {
@@ -88,12 +104,12 @@ export default function Products() {
 
   const saveEdit = async () => {
     try {
-      const { uid, name, price, description } = editingProduct;
-      const { error } = await supabase.from('items')
-        .update({ name, price, description })
-        .eq('uid', uid);
-      if (error) throw error;
-
+      const { id, name, price, description } = editingProduct;
+      await updateDoc(doc(db, 'items', id), {
+        name,
+        price,
+        description
+      });
       setEditingProduct(null);
       fetchProducts();
     } catch (err) {
@@ -105,9 +121,7 @@ export default function Products() {
     <div className="dashboard-card">
       <h2 className="text-xl font-bold mb-4">Product Management</h2>
 
-      <button className="btn-add mb-4" onClick={() => setShowAddForm(true)}>
-        Add Product
-      </button>
+      <button className="btn-add mb-4" onClick={() => setShowAddForm(true)}>Add Product</button>
 
       {showAddForm && (
         <div className="modal-overlay">
@@ -117,7 +131,6 @@ export default function Products() {
             <label>Product Name*</label>
             <input
               type="text"
-              placeholder="Enter name"
               value={newProduct.name}
               onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
             />
@@ -125,7 +138,6 @@ export default function Products() {
             <label>Price*</label>
             <input
               type="text"
-              placeholder="Enter price"
               value={newProduct.price}
               onChange={(e) =>
                 setNewProduct({
@@ -135,12 +147,17 @@ export default function Products() {
               }
             />
 
-
             <label>Description*</label>
             <textarea
-              placeholder="Enter description"
               value={newProduct.description}
               onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })}
+            />
+
+            <label>Image*</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => setNewProduct({ ...newProduct, image: e.target.files[0] })}
             />
 
             <label>Category</label>
@@ -157,10 +174,11 @@ export default function Products() {
       <table className="users-table mt-6">
         <thead>
           <tr>
-            <th>UID</th>
+            <th>ID</th>
             <th>Name</th>
             <th>Price</th>
             <th>Description</th>
+            <th>Image</th>
             <th>Category</th>
             <th>Actions</th>
           </tr>
@@ -168,26 +186,22 @@ export default function Products() {
         <tbody>
           {products.length > 0 ? (
             products.map((product) => (
-              <tr key={product.uid}>
-                <td>{product.uid}</td>
+              <tr key={product.id}>
+                <td>{product.id}</td>
 
                 <td>
-                  {editingProduct?.uid === product.uid ? (
+                  {editingProduct?.id === product.id ? (
                     <input
                       type="text"
                       value={editingProduct.name}
-                      onChange={(e) =>
-                        setEditingProduct({ ...editingProduct, name: e.target.value })
-                      }
+                      onChange={(e) => setEditingProduct({ ...editingProduct, name: e.target.value })}
                       className="inline-input"
                     />
-                  ) : (
-                    product.name
-                  )}
+                  ) : product.name}
                 </td>
 
                 <td>
-                  {editingProduct?.uid === product.uid ? (
+                  {editingProduct?.id === product.id ? (
                     <input
                       type="text"
                       value={editingProduct.price}
@@ -199,14 +213,11 @@ export default function Products() {
                       }
                       className="inline-input"
                     />
-
-                  ) : (
-                    product.price
-                  )}
+                  ) : product.price}
                 </td>
 
                 <td>
-                  {editingProduct?.uid === product.uid ? (
+                  {editingProduct?.id === product.id ? (
                     <input
                       type="text"
                       value={editingProduct.description}
@@ -215,9 +226,13 @@ export default function Products() {
                       }
                       className="inline-input"
                     />
-                  ) : (
-                    product.description
-                  )}
+                  ) : product.description}
+                </td>
+
+                <td>
+                  {product.image ? (
+                    <img src={product.image} alt="Product" style={{ width: 60, height: 60, objectFit: 'cover' }} />
+                  ) : 'No image'}
                 </td>
 
                 <td>
@@ -225,26 +240,22 @@ export default function Products() {
                 </td>
 
                 <td>
-                  {editingProduct?.uid === product.uid ? (
+                  {editingProduct?.id === product.id ? (
                     <>
                       <button className="btn-submit" onClick={saveEdit}>Save</button>
                       <button className="btn-cancel" onClick={cancelEditing}>Cancel</button>
                     </>
                   ) : (
                     <>
-                      <button className="btn-edit" onClick={() => startEditing(product)}>
-                        Edit
-                      </button>
-                      <button className="btn-delete" onClick={() => deleteProduct(product.uid)}>
-                        Delete
-                      </button>
+                      <button className="btn-edit" onClick={() => startEditing(product)}>Edit</button>
+                      <button className="btn-delete" onClick={() => deleteProduct(product.id)}>Delete</button>
                     </>
                   )}
                 </td>
               </tr>
             ))
           ) : (
-            <tr><td colSpan="6">No products found.</td></tr>
+            <tr><td colSpan="7">No products found.</td></tr>
           )}
         </tbody>
       </table>
