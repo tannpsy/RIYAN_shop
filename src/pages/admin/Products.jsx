@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { db, storage } from '../../lib/firebase';
+import { db } from '../../lib/firebase';
 import {
   collection,
   addDoc,
@@ -8,11 +8,6 @@ import {
   updateDoc,
   doc
 } from 'firebase/firestore';
-import {
-  ref,
-  uploadBytes,
-  getDownloadURL
-} from 'firebase/storage';
 import '../../css/Products.css';
 
 export default function Products() {
@@ -43,6 +38,15 @@ export default function Products() {
 
   const unformatRupiah = (value) => value.replace(/[^0-9]/g, '');
 
+  const convertToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (error) => reject(error);
+    });
+  };
+
   const fetchProducts = async () => {
     try {
       const querySnapshot = await getDocs(collection(db, 'items'));
@@ -53,13 +57,6 @@ export default function Products() {
     }
   };
 
-  const uploadImage = async (file) => {
-    const fileName = `${Date.now()}-${file.name}`;
-    const storageRef = ref(storage, `product-images/${fileName}`);
-    await uploadBytes(storageRef, file);
-    return await getDownloadURL(storageRef);
-  };
-
   const addProduct = async () => {
     try {
       if (!newProduct.name || !newProduct.price || !newProduct.description || !newProduct.image) {
@@ -67,13 +64,13 @@ export default function Products() {
         return;
       }
 
-      const imageUrl = await uploadImage(newProduct.image);
+      const imageBase64 = await convertToBase64(newProduct.image);
 
       await addDoc(collection(db, 'items'), {
         name: newProduct.name.trim(),
         price: newProduct.price.trim(),
         description: newProduct.description.trim(),
-        image: imageUrl,
+        image: imageBase64,
         category: 'Hoodie'
       });
 
@@ -95,7 +92,7 @@ export default function Products() {
   };
 
   const startEditing = (product) => {
-    setEditingProduct({ ...product });
+    setEditingProduct({ ...product, imageFile: null });
   };
 
   const cancelEditing = () => {
@@ -104,12 +101,15 @@ export default function Products() {
 
   const saveEdit = async () => {
     try {
-      const { id, name, price, description } = editingProduct;
-      await updateDoc(doc(db, 'items', id), {
-        name,
-        price,
-        description
-      });
+      const { id, name, price, description, imageFile } = editingProduct;
+      let updateData = { name, price, description };
+
+      if (imageFile) {
+        const imageBase64 = await convertToBase64(imageFile);
+        updateData.image = imageBase64;
+      }
+
+      await updateDoc(doc(db, 'items', id), updateData);
       setEditingProduct(null);
       fetchProducts();
     } catch (err) {
@@ -230,7 +230,24 @@ export default function Products() {
                 </td>
 
                 <td>
-                  {product.image ? (
+                  {editingProduct?.id === product.id ? (
+                    <>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) =>
+                          setEditingProduct({ ...editingProduct, imageFile: e.target.files[0] })
+                        }
+                      />
+                      {editingProduct.image && (
+                        <img
+                          src={editingProduct.image}
+                          alt="Preview"
+                          style={{ width: 60, height: 60, objectFit: 'cover', marginTop: '0.5rem' }}
+                        />
+                      )}
+                    </>
+                  ) : product.image ? (
                     <img src={product.image} alt="Product" style={{ width: 60, height: 60, objectFit: 'cover' }} />
                   ) : 'No image'}
                 </td>
