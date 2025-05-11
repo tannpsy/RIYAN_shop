@@ -1,0 +1,29 @@
+.reviews-container {
+  padding: 20px;
+  background-color: #f9fafb;
+  border-radius: 8px;
+}
+
+.reviews-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+}
+
+.reviews-table th,
+.reviews-table td {
+  padding: 14px 18px;
+  border: 1px solid #e2e8f0;
+  text-align: left;
+  font-size: 16px; /* font lebih besar */
+}
+
+.reviews-table th {
+  background-color: #f1f5f9;
+  font-weight: 700; /* lebih tebal */
+}
+
+.reviews-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}

@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom'; // Add useLocation
 import UsersAdmin from './UsersAdmin';
 import { supabase } from '../../lib/supabase';
 import Products from './Products';
+import Reviews from './Reviews';
 
 export default function AdminDashboard() {
   const [activePage, setActivePage] = useState('dashboard');
@@ -16,6 +17,8 @@ export default function AdminDashboard() {
       setActivePage('users');
     } else if (location.pathname === '/admin/products') {
       setActivePage('products');
+    } else if (location.pathname === '/admin/reviews') {
+      setActivePage('reviews');
     } else {
       setActivePage('dashboard');
     }
@@ -67,6 +70,8 @@ export default function AdminDashboard() {
         return <UsersAdmin setTotalUsers={setTotalUsers} />;
       case 'products':
         return <Products />;
+      case 'reviews':
+        return <Reviews />;
       default:
         return <div>Page not found</div>;
     }
@@ -80,6 +85,8 @@ export default function AdminDashboard() {
       navigate('/admin/users');
     } else if (page === 'products') {
       navigate('/admin/products');
+    } else {
+      navigate('/admin/reviews');
     }
   };
 
@@ -101,7 +108,7 @@ export default function AdminDashboard() {
               <li onClick={() => handleSidebarClick('dashboard')}>Dashboard</li>
               <li onClick={() => handleSidebarClick('users')}>Users</li>
               <li onClick={() => handleSidebarClick('products')}>Products</li>
-              <li>Reviews</li>
+              <li onClick={() => handleSidebarClick('reviews')}>Reviews</li>
             </ul>
           </nav>
         </aside>

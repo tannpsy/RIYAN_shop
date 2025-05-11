@@ -8,6 +8,7 @@ import RegisterPage from './pages/auth/RegisterPage';
 import UsersAdmin from './pages/admin/UsersAdmin';
 import AdminHome from './pages/admin/AdminHome';
 import Products from './pages/admin/Products';
+import Reviews from './pages/admin/Reviews';
 import ItemList from './pages/user/item/ItemsPage';
 import ItemDetailPage from './pages/user/item/itemDetailPage';
 
@@ -28,12 +29,7 @@ function App() {
         <Route path="users" element={<UsersAdmin />} />
         <Route path="products" element={<Products />} />
         <Route path="users" element={<UsersAdmin />} />
-      </Route>
-      
-      <Route path="/admin" element={<AdminDashboard />}>
-        <Route index element={<AdminHome />} />
-        <Route path="users" element={<UsersAdmin />} />
-        <Route path="products" element={<Products />} />
+        <Route path="reviews" element={<Reviews />} />
       </Route>
 
       <Route path="*" element={<NotFound />} />

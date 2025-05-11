@@ -12,11 +12,12 @@ const NavBar = () => {
           <img src="/logo3.png" alt="PresUniv" className="logo-img" />
         </div>
         <nav className="nav">
-          <a href="#">Home</a>
+          {/* Mengubah anchor tag menjadi onClick handler untuk navigate */}
+          <a href="#" onClick={() => navigate('/')}>Home</a>
           <a href="#" className="icon-link">
             <FaShoppingCart className="icon" />
           </a>
-          <button onClick={() => navigate('/items')}>Items</button>
+          <button className="items" onClick={() => navigate('/items')}>Items</button>
         </nav>
       </div>
 
@@ -24,7 +25,7 @@ const NavBar = () => {
         <button className="sign-in" onClick={() => navigate('/admin')}>
           Sign In
         </button>
-        <button className="get-started">Get Started</button>
+        <button className="get-started" onClick={() => navigate('register')}>Get Started</button>
       </div>
     </header>
   );
