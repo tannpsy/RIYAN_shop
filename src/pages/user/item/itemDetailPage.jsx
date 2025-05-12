@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./ItemDetails.css";
+import "../../../css/ItemDetails.css";
 
 const UniversityHoodie = () => {
   const [comment, setComment] = useState("");

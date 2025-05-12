@@ -33,9 +33,7 @@ export default function HomePage() {
       <div className="popular">
         <h1>Popular Clothes</h1>
       </div>
-
       <Footer/>
     </div>
   );
 }
-

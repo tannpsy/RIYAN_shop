@@ -17,17 +17,15 @@ const NavBar = () => {
   return (
     <header className="header">
       <div className="header-left">
-        <div className="logo">
+        <div className="logo" onClick={() => navigate('/')}>
           <img src="/logo3.png" alt="PresUniv" className="logo-img" />
         </div>
         <nav className="nav">
-          <a href="/">Home</a>
-          <a href="#" className="icon-link" onClick={() => checkSessionAndNavigate('/items')}>
+          <button className="nav-link" onClick={() => navigate('/')}>Home</button>
+          <button className="icon-link" onClick={() => checkSessionAndNavigate('/items')}>
             <FaShoppingCart className="icon" />
-          </a>
-          <button className="items" onClick={() => checkSessionAndNavigate('/items')}>
-            Items
           </button>
+          <button className="items" onClick={() => checkSessionAndNavigate('/items')}>Items</button>
         </nav>
       </div>
 
@@ -35,7 +33,7 @@ const NavBar = () => {
         <button className="sign-in" onClick={() => checkSessionAndNavigate('/home')}>
           Sign In
         </button>
-        <button className="get-started" onClick={() => navigate('/register')}>
+        <button className="get-started" onClick={() => checkSessionAndNavigate('/register')}>
           Get Started
         </button>
       </div>

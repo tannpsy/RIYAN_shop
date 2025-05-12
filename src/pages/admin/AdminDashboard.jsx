@@ -2,22 +2,40 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import UsersAdmin from './UsersAdmin';
 import Products from './Products';
-import { supabase } from '../../lib/supabase';
+import Reviews from './Reviews';
+import { auth, db } from '../../lib/firebase';
+import { doc, getDoc, collection, getCountFromServer } from 'firebase/firestore';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
 
 export default function AdminDashboard() {
   const [activePage, setActivePage] = useState('dashboard');
   const [totalUsers, setTotalUsers] = useState(0);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Session check
+  // Session and token expiration check
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem('user'));
-    if (!user) {
-      navigate('/login');
-    } else if (user.role !== 'admin') {
-      navigate('/');
-    }
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        localStorage.removeItem('user');
+        navigate('/login');
+        return;
+      }
+
+      const userSession = JSON.parse(localStorage.getItem('user'));
+
+      if (!userSession || userSession.role !== 'admin') {
+        await signOut(auth);
+        localStorage.removeItem('user');
+        navigate('/');
+        return;
+      }
+
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
   }, [navigate]);
 
   // Sync activePage with current route
@@ -26,22 +44,20 @@ export default function AdminDashboard() {
       setActivePage('users');
     } else if (location.pathname === '/admin/products') {
       setActivePage('products');
+    } else if (location.pathname === '/admin/reviews') {
+      setActivePage('reviews');
     } else {
       setActivePage('dashboard');
     }
   }, [location]);
 
-  // Fetch total users count
+  // Fetch total users from Firebase Firestore
   useEffect(() => {
     const fetchTotalUsers = async () => {
       try {
-        const { data, error } = await supabase
-          .from('users')
-          .select('id', { count: 'exact' });
-
-        if (error) throw error;
-
-        setTotalUsers(data.length);
+        const usersCollection = collection(db, 'users');
+        const snapshot = await getCountFromServer(usersCollection);
+        setTotalUsers(snapshot.data().count);
       } catch (error) {
         console.error("Error fetching total users:", error.message);
       }
@@ -75,6 +91,8 @@ export default function AdminDashboard() {
         return <UsersAdmin setTotalUsers={setTotalUsers} />;
       case 'products':
         return <Products />;
+      case 'reviews':
+        return <Reviews />;
       default:
         return <div>Page not found</div>;
     }
@@ -89,6 +107,8 @@ export default function AdminDashboard() {
     }
   };
 
+  if (loading) return <div>Loading...</div>;
+
   return (
     <div className="dashboard-layout">
       <header className="top-navbar">
@@ -97,6 +117,16 @@ export default function AdminDashboard() {
         </div>
         <div className="user-actions">
           <span>Welcome, Admin</span>
+          <button
+            onClick={async () => {
+              await signOut(auth);
+              localStorage.removeItem('user');
+              navigate('/login');
+            }}
+            className="logout-button"
+          >
+            Logout
+          </button>
         </div>
       </header>
 
@@ -107,7 +137,7 @@ export default function AdminDashboard() {
               <li onClick={() => handleSidebarClick('dashboard')}>Dashboard</li>
               <li onClick={() => handleSidebarClick('users')}>Users</li>
               <li onClick={() => handleSidebarClick('products')}>Products</li>
-              <li>Reviews</li>
+              <li onClick={() => handleSidebarClick('reviews')}>Reviews</li>
             </ul>
           </nav>
         </aside>

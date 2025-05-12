@@ -14,6 +14,7 @@ import UsersAdmin from './pages/admin/UsersAdmin';
 import Products from './pages/admin/Products';
 
 import NotFound from './pages/NotFound';
+import Reviews from './pages/admin/Reviews';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -62,6 +63,7 @@ function App() {
         <Route index element={<AdminHome />} />
         <Route path="users" element={<UsersAdmin />} />
         <Route path="products" element={<Products />} />
+        <Route path="reviews" element={<Reviews />} />
       </Route>
 
       {/* Catch-All */}
