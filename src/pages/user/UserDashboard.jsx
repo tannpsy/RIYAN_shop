@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../../lib/supabase';
+import { auth, db } from '../../lib/firebase';
+import { doc, getDoc } from 'firebase/firestore';
 import NavBar from '../../components/NavBar.jsx';
-import Footer from '../../components/Footer.jsx'
+import Footer from '../../components/Footer.jsx';
 import '../../css/Dashboard.css';
 
 export default function UserDashboard() {
@@ -12,47 +13,58 @@ export default function UserDashboard() {
 
   useEffect(() => {
     const fetchUserData = async () => {
-      const {
-        data: { user },
-        error: userError
-      } = await supabase.auth.getUser();
+      const session = localStorage.getItem('user');
 
-      if (userError || !user) {
+      if (!session) {
         navigate('/login');
         return;
       }
 
-      const { data: userDetails, error: fetchError } = await supabase
-        .from('users')
-        .select('*')
-        .eq('uid', user.id)
-        .single();
+      const { uid, role } = JSON.parse(session);
 
-      if (fetchError || !userDetails) {
-        console.error('Failed to fetch user details:', fetchError);
+      // Only allow "user" role to access this page
+      if (role !== 'user') {
         navigate('/login');
         return;
       }
 
-      setUserData(userDetails);
-      setIsLoading(false);
+      try {
+        const userDocRef = doc(db, 'users', uid);
+        const userDoc = await getDoc(userDocRef);
+
+        if (!userDoc.exists()) {
+          console.error('User not found in database');
+          navigate('/login');
+          return;
+        }
+
+        setUserData(userDoc.data());
+      } catch (err) {
+        console.error('Failed to fetch user data:', err);
+        navigate('/login');
+      } finally {
+        setIsLoading(false);
+      }
     };
 
     fetchUserData();
   }, [navigate]);
 
   const handleLogout = async () => {
-    setIsLoading(true);
-    await supabase.auth.signOut();
-    localStorage.removeItem('role'); // optional, depending on your app
-    navigate('/login');
+    try {
+      await auth.signOut();
+      localStorage.removeItem('user');
+      navigate('/login');
+    } catch (err) {
+      console.error('Logout failed:', err);
+    }
   };
 
   if (isLoading) return <div>Loading...</div>;
 
   return (
     <div className="dashboard-container">
-      <NavBar/>
+      <NavBar />
       <header className="dashboard-header">
         <h1>User Dashboard</h1>
         <div className="user-actions">
@@ -84,7 +96,7 @@ export default function UserDashboard() {
           </div>
         </div>
       </main>
-      <Footer/>
+      <Footer />
     </div>
   );
 }

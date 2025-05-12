@@ -1,16 +1,26 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom'; // Add useLocation
+import { useNavigate, useLocation } from 'react-router-dom';
 import UsersAdmin from './UsersAdmin';
-import { supabase } from '../../lib/supabase';
 import Products from './Products';
+import { supabase } from '../../lib/supabase';
 
 export default function AdminDashboard() {
   const [activePage, setActivePage] = useState('dashboard');
   const [totalUsers, setTotalUsers] = useState(0);
   const navigate = useNavigate();
-  const location = useLocation(); // Initialize useLocation
+  const location = useLocation();
 
-  // Sync activePage with the current route
+  // Session check
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (!user) {
+      navigate('/login');
+    } else if (user.role !== 'admin') {
+      navigate('/');
+    }
+  }, [navigate]);
+
+  // Sync activePage with current route
   useEffect(() => {
     if (location.pathname === '/admin/users') {
       setActivePage('users');
@@ -29,9 +39,7 @@ export default function AdminDashboard() {
           .from('users')
           .select('id', { count: 'exact' });
 
-        if (error) {
-          throw error;
-        }
+        if (error) throw error;
 
         setTotalUsers(data.length);
       } catch (error) {
@@ -50,7 +58,7 @@ export default function AdminDashboard() {
             <div className="dashboard-header-row">
               <div className="dashboard-card flex-grow">
                 <h2>Admin Control Panel</h2>
-                <p>This is a static admin panel accessible without authentication.</p>
+                <p>This dashboard is accessible only to authenticated admins.</p>
               </div>
               <div className="stat-card admin-stat fixed-width">
                 <h3>Total Users</h3>
@@ -76,10 +84,8 @@ export default function AdminDashboard() {
     setActivePage(page);
     if (page === 'dashboard') {
       navigate('/admin');
-    } else if (page === 'users') {
-      navigate('/admin/users');
-    } else if (page === 'products') {
-      navigate('/admin/products');
+    } else {
+      navigate(`/admin/${page}`);
     }
   };
 

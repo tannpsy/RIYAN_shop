@@ -1,14 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Mail, Lock } from 'lucide-react';
 import { auth, db } from '../../lib/firebase';
-import {
-  signInWithEmailAndPassword
-} from 'firebase/auth';
-import {
-  doc,
-  getDoc
-} from 'firebase/firestore';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import '../../css/Auth.css';
@@ -18,6 +13,19 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+
+  // Redirect user if already logged in
+  useEffect(() => {
+    const session = localStorage.getItem('user');
+    if (session) {
+      const { role } = JSON.parse(session);
+      if (role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/home');
+      }
+    }
+  }, [navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -53,6 +61,9 @@ export default function LoginPage() {
 
       const { fullname, role } = userDoc.data();
 
+      // Save session in localStorage
+      localStorage.setItem('user', JSON.stringify({ uid: user.uid, role }));
+
       toast.success(`Welcome, ${fullname}`, {
         position: 'top-center',
         autoClose: 1500,
@@ -64,11 +75,7 @@ export default function LoginPage() {
       });
 
       setTimeout(() => {
-        if (role === 'admin') {
-          navigate('/admin');
-        } else {
-          navigate('/home');
-        }
+        navigate(role === 'admin' ? '/admin' : '/home');
       }, 1600);
 
     } catch (err) {

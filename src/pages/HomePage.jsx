@@ -30,9 +30,8 @@ export default function HomePage() {
         </div>
       </main>
 
-      <div>
+      <div className="popular">
         <h1>Popular Clothes</h1>
-        <ItemList />
       </div>
 
       <Footer/>
