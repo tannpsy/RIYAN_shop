@@ -31,7 +31,7 @@ const NavBar = () => {
     <header className="header">
       <div className="header-left">
         <div className="logo" onClick={() => navigate('/')}>
-          <img src="/logo3.png" alt="PresUniv" className="logo-img" />
+          <img src="/logo3.new.png" alt="PresUniv" className="logo-img" />
         </div>
         <nav className="nav">
           <button className="nav-link" onClick={() => navigate('/')}>Home</button>

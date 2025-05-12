@@ -133,11 +133,36 @@
   font-size: 14px;
 }
 
+.submit-cmt {
+  padding: 10px 16px;
+  font-size: 14px;
+  background-color: green;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 15px;
+}
+
+.submit-cmt:hover {
+  background-color: #1e40af;
+}
+
 .review-filters {
   display: flex;
   gap: 12px;
   margin-bottom: 24px;
 }
+
+.review-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* jarak antara input dan tombol */
+  width: 100%; /* agar full lebar */
+}
+
+
 
 .filter-btn {
   padding: 6px 12px;

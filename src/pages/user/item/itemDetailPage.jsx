@@ -1,11 +1,27 @@
 import React, { useState } from "react";
 import "../../../css/ItemDetails.css";
+import NavBar from '../../../components/NavBar'; 
+import Footer from '../../../components/Footer';
 
-const UniversityHoodie = () => {
+const ItemDetails = () => {
   const [comment, setComment] = useState("");
+  const [showFullDescription, setShowFullDescription] = useState(false);
+
+  const handleSeeMore = () => {
+    setShowFullDescription(!showFullDescription);
+  };
+
+  const handleSubmitComment = () => {
+    if (comment.trim()) {
+      alert(`Comment submitted: ${comment}`);
+      setComment(""); // Reset comment box
+    }
+  };
 
   return (
-    <div className="hoodie-container">
+    <>
+      <NavBar /> 
+      <div className="hoodie-container">
       {/* Product Section */}
       <div className="hoodie-product-section">
         <div className="hoodie-image-wrapper">
@@ -34,11 +50,26 @@ const UniversityHoodie = () => {
           <div className="hoodie-description">
             <h2>Product Description</h2>
             <p>
-              Bdawdajdkajkdlajdlkajldajwdadajdlkjawkldjakldjakldjwakldjakldjakldjakldjalwkdjaklwjdaklwjdlkadjlawkdjawkldjwkladjwlakdjwlkadjlakwjdklawjdlkwajda 
-              <br/>
-              <br/>
-              dwkjakdjakjdlakjdlkajdklajdkla...
-              <span className="see-more"> See More …</span>
+              {showFullDescription ? (
+                <>
+                  Bdawdajdkajkdlajdlkajldajwdadajdlkjawkldjakldjakldjwakldjakldjakldjakldjalwkdjaklwjdaklwjdlkadjlawkdjawkldjwkladjwlakdjwlkadjlakwjdklawjdlkwajda
+                  <br />
+                  <br />
+                  dwkjakdjakjdlakjdlkajdklajdkla
+                </>
+              ) : (
+                <>
+                  Bdawdajdkajkdlajdlkajldajwdadajdlkjawkldjakldjakldjwakldja...
+                  <span className="see-more" onClick={handleSeeMore} style={{ cursor: "pointer", color: "blue" }}>
+                    {" "}See More …
+                  </span>
+                </>
+              )}
+              {showFullDescription && (
+                <span className="see-less" onClick={handleSeeMore} style={{ cursor: "pointer", color: "blue" }}>
+                  {" "}See Less
+                </span>
+              )}
             </p>
           </div>
 
@@ -62,13 +93,19 @@ const UniversityHoodie = () => {
           </div>
         </div>
 
-        <input
-          type="text"
-          placeholder="Write a comment here ..."
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
-          className="review-input"
-        />
+        <div className="review-input-wrapper">
+          <input
+            type="text"
+            placeholder="Write a comment here ..."
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            className="review-input"
+            style={{ flexGrow: 1 }}
+          />
+          <button onClick={handleSubmitComment} className="submit-cmt">
+            Submit
+          </button>
+        </div>
 
         <div className="review-list">
           <div className="review-item">
@@ -78,10 +115,10 @@ const UniversityHoodie = () => {
               </p>
               <p className="label-positive">POSITIVE</p>
             </div>
-            <p className="review-text">
+              <p className="review-text">
               dnwandjkwadjkandajk dnawjkndkajndakjdakjndjawkndajwdmajwndawkdnjanskdnwandjawndkandjawnkdnajdsioawodkoskckasjkcakdjbawjdnamsndkajwndnjksand
-            </p>
-          </div>
+              </p>
+            </div>
 
           <div className="review-item">
             <div className="review-header-line">
@@ -109,8 +146,9 @@ const UniversityHoodie = () => {
         </div>
       </div>
     </div>
-
+    <Footer/>
+    </>
   );
 };
 
-export default UniversityHoodie;
+export default ItemDetails;

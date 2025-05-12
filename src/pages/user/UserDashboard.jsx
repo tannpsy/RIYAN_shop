@@ -65,15 +65,6 @@ export default function UserDashboard() {
   return (
     <div className="dashboard-container">
       <NavBar />
-      <header className="dashboard-header">
-        <h1>User Dashboard</h1>
-        <div className="user-actions">
-          <span>Welcome, {userData?.username || 'User'}</span>
-          <button onClick={handleLogout} className="logout-button">
-            Logout
-          </button>
-        </div>
-      </header>
 
       <main className="main">
         <div className="hero-text">
