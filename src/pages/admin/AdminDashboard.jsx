@@ -113,7 +113,7 @@ export default function AdminDashboard() {
     <div className="dashboard-layout">
       <header className="top-navbar">
         <div className="logo">
-          <img src="/logo3.png" alt="Logo" className="logo-img" />
+          <img src="/logo3.new.png" alt="Logo" className="logo-img" />
         </div>
         <div className="user-actions">
           <span>Welcome, Admin</span>
