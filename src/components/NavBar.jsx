@@ -1,13 +1,26 @@
-import '../css/HomePage.css';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaShoppingCart } from 'react-icons/fa';
+import '../css/HomePage.css';
 
 const NavBar = () => {
   const navigate = useNavigate();
+  const [user, setUser] = useState(null);
 
-  const checkSessionAndNavigate = (targetPath) => {
+  useEffect(() => {
     const session = localStorage.getItem('user');
     if (session) {
+      setUser(JSON.parse(session));
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    navigate('/login');
+  };
+
+  const checkSessionAndNavigate = (targetPath) => {
+    if (user) {
       navigate(targetPath);
     } else {
       navigate('/login');
@@ -30,12 +43,21 @@ const NavBar = () => {
       </div>
 
       <div className="header-right">
-        <button className="sign-in" onClick={() => checkSessionAndNavigate('/home')}>
-          Sign In
-        </button>
-        <button className="get-started" onClick={() => checkSessionAndNavigate('/register')}>
-          Get Started
-        </button>
+        {user ? (
+          <>
+            <span className="welcome-msg">Hi, {user.username || 'User'}</span>
+            <button className="sign-in" onClick={handleLogout}>Logout</button>
+          </>
+        ) : (
+          <>
+            <button className="sign-in" onClick={() => navigate('/login')}>
+              Sign In
+            </button>
+            <button className="get-started" onClick={() => navigate('/register')}>
+              Get Started
+            </button>
+          </>
+        )}
       </div>
     </header>
   );

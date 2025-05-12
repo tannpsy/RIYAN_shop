@@ -90,7 +90,6 @@
 /* Main content */
 .dashboard-container {
   flex: 1;
-  padding: 2rem;
 }
 
 .dashboard-card {

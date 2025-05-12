@@ -5,6 +5,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import NavBar from '../../components/NavBar.jsx';
 import Footer from '../../components/Footer.jsx';
 import '../../css/Dashboard.css';
+import '../../css/HomePage.css';
 
 export default function UserDashboard() {
   const [userData, setUserData] = useState(null);
@@ -22,7 +23,6 @@ export default function UserDashboard() {
 
       const { uid, role } = JSON.parse(session);
 
-      // Only allow "user" role to access this page
       if (role !== 'user') {
         navigate('/login');
         return;
@@ -75,27 +75,18 @@ export default function UserDashboard() {
         </div>
       </header>
 
-      <main className="dashboard-content">
-        <div className="dashboard-card">
-          <h2>Hello {userData.fullname}!</h2>
-          <p>This is a protected dashboard only for users with the role <strong>"user"</strong>.</p>
+      <main className="main">
+        <div className="hero-text">
+          <h1 className="gradient-text">
+            MERCHANDISE <br /> CENTER
+          </h1>
+          <p className="enhanced-text">Experience a high quality clothes and be part of President University</p>
         </div>
-
-        <div className="dashboard-stats">
-          <div className="stat-card">
-            <h3>Your Projects</h3>
-            <p className="stat-number">5</p>
-          </div>
-          <div className="stat-card">
-            <h3>Tasks</h3>
-            <p className="stat-number">12</p>
-          </div>
-          <div className="stat-card">
-            <h3>Messages</h3>
-            <p className="stat-number">3</p>
-          </div>
+        <div className="hero-logo">
+          <img src="/logo2.png" alt="PresUniv Merchandise Center" className="hero-img" />
         </div>
       </main>
+      
       <Footer />
     </div>
   );

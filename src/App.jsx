@@ -20,12 +20,10 @@ import ProtectedRoute from './components/ProtectedRoute';
 function App() {
   return (
     <Routes>
-      {/* Public Routes */}
       <Route path="/" element={<HomePage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
 
-      {/* User Protected Routes */}
       <Route
         path="/home"
         element={
@@ -51,7 +49,6 @@ function App() {
         }
       />
 
-      {/* Admin Protected Routes */}
       <Route
         path="/admin"
         element={
@@ -66,7 +63,6 @@ function App() {
         <Route path="reviews" element={<Reviews />} />
       </Route>
 
-      {/* Catch-All */}
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
