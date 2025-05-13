@@ -21,9 +21,12 @@ body, html, #root {
   align-items: center;
   padding: 1rem 2rem;
   width: 100%;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   box-sizing: border-box;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  top: 0;
+  z-index: 1000;
 }
+
 
 .header-left {
   display: flex;
@@ -346,3 +349,5 @@ body, html, #root {
   border-radius: 5px;
   z-index: 1;
 }
+
+

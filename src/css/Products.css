@@ -136,3 +136,11 @@
 .btn-cancel:hover {
   background-color: #4b5563;
 }
+
+.see-more-btn {
+  background: none;
+  border: none;
+  color: blue;
+  cursor: pointer;
+  font-size: 12px;
+}

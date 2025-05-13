@@ -71,8 +71,14 @@ export default function ItemsPage() {
   };
 
   if (isLoading) {
-    return <div className="loading">Loading...</div>;
-  }
+      return (
+        <div className="loading-screen">
+          <div className="spinner" />
+          <p>Loading Items...</p>
+        </div>
+      );
+    }
+
 
   return (
     <>

@@ -178,46 +178,42 @@ const ItemDetails = () => {
   return (
     <>
       <NavBar />
-      <div className="hoodie-container">
-        <div className="hoodie-product-section">
-          <div className="hoodie-image-wrapper">
-            <img src={item.image} alt={item.name} className="hoodie-image" />
+      <div className="items-container">
+        <div className="items-product-section">
+          <div className="items-image-wrapper">
+            <img src={item.image} alt={item.name} className="items-image" />
           </div>
 
-          <div className="hoodie-info">
-            <h1 className="hoodie-title">{item.name?.toUpperCase()}</h1>
-            <hr className="hoodie-divider1" />
-            <hr className="hoodie-divider2" />
-            <div className="hoodie-rating">
-              <span className="hoodie-null">{averageRating.toFixed(1)}</span>
-              <div className="hoodie-stars">
+          <div className="items-info">
+            <h1 className="items-title">{item.name?.toUpperCase()}</h1>
+            <hr className="items-divider1" />
+            <hr className="items-divider2" />
+            <div className="items-rating">
+              <span className="items-null">{averageRating.toFixed(1)}</span>
+              <div className="items-stars">
                 {[...Array(5)].map((_, idx) => (
                   <span
                     key={idx}
                     className="star"
                     style={{
-                      color:
-                        idx < Math.round(averageRating)
-                          ? sentimentColor
-                          : "#ccc",
+                      color: idx < Math.round(averageRating) ? sentimentColor : "#ccc",
                     }}
                   >
                     ★
                   </span>
                 ))}
               </div>
-              <span
-                className="hoodie-positive"
-                style={{ color: sentimentColor, marginLeft: "10px" }}
-              >
-                | {avgSentiment}
+              <span className="separator">|</span>
+              <span className="items-positive" style={{ color: sentimentColor }}>
+                {avgSentiment}
               </span>
             </div>
-            <div className="hoodie-price">
+
+            <div className="items-price">
               {formatRupiah(parseInt(item.price))}
             </div>
 
-            <div className="hoodie-description">
+            <div className="items-description">
               <h2>Product Description</h2>
               <p>
                 {showFullDescription ? (
@@ -247,7 +243,7 @@ const ItemDetails = () => {
               </p>
             </div>
 
-            <div className="hoodie-buttons">
+            <div className="items-buttons">
               <button className="btn-cart">🛒 Add to Cart</button>
               <button className="btn-buy">Buy Now</button>
             </div>
@@ -255,7 +251,7 @@ const ItemDetails = () => {
         </div>
 
         {/* Review Section */}
-        <div className="hoodie-review-section">
+        <div className="items-review-section">
           <div className="review-header">
             <h2 className="review-title">Reviews</h2>
             <div className="review-filters">

@@ -1,5 +1,5 @@
 /* Container */
-.hoodie-container {
+.items-container {
   width: 100%;
   max-width: 100%;
   padding: 24px 48px;
@@ -7,19 +7,19 @@
 }
 
 /* Product Section */
-.hoodie-product-section {
+.items-product-section {
   display: flex;
   flex-direction: column;
   gap: 24px;
 }
 
 @media (min-width: 768px) {
-  .hoodie-product-section {
+  .items-product-section {
     flex-direction: row;
   }
 }
 
-.hoodie-image-wrapper {
+.items-image-wrapper {
   flex: 1;
   padding: 5px;
   display: flex;
@@ -29,60 +29,58 @@
 }
 
 
-.hoodie-image {
+.items-image {
   width: 100%; 
   max-width: 100%;
   object-fit: cover;
 }
 
-.hoodie-info {
+.items-info {
   flex: 2;
   display: flex;
   flex-direction: column;
   gap: 5px;
 }
 
-.hoodie-title {
+.items-title {
   font-size: 30px;
   font-weight: bold;
   text-transform: uppercase;
+  text-align: left;
+  margin-bottom: 0; 
 }
 
-.hoodie-rating {
+
+.items-rating {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
-.hoodie-null {
+.items-null {
   font-size: 20px;
   color: black;
 }
 
 
-.hoodie-positive {
+.items-positive {
   font-size: 20px;
   color: black;
 }
 
-.hoodie-price {
-  font-size: 28px;
-  font-weight: 600;
-  color: #DC2626;
-  background-color: #f3f4f6;
-}
-
-.hoodie-description h2 {
+.items-description h2 {
   font-size: 20px;
   font-weight: bold;
+  text-align: left;
 }
 
-.hoodie-description p {
+.items-description p {
   font-size: 14px;
   color: #4b5563;
+  text-align: left;
 }
 
-.hoodie-buttons {
+.items-buttons {
   display: flex;
   gap: 16px;
 }
@@ -114,7 +112,7 @@
 
 
 /* Review Section */
-.hoodie-review-section {
+.items-review-section {
   margin-top: 48px;
 }
 
@@ -173,12 +171,13 @@
   font-size: 12px;
   margin-top: 20px;
   margin-right: 20px;
+  color: black; 
 }
-
 .filter-btn:hover {
   background-color: #f1f5f9;
-}
+  color: black; 
 
+}
 .review-list {
   display: flex;
   flex-direction: column;
@@ -198,31 +197,34 @@
 .review-text {
   margin-top: 4px;
   color: #374151;
+  text-align: left;
 }
 
-.hoodie-divider1 {
-  border: none;
-  height: 3px;
-  background: #DC2626;
-  margin: 2px 0 2px;
-}
-.hoodie-divider2 {
+.items-divider1 {
   border: none;
   height: 5px;
-  background: #2563EB;
+  background: #e20a16;
   margin: 0 0 2px;
 }
 
-.hoodie-stars .star {
+.items-divider2 {
+  border: none;
+  height: 5px;
+  background: #00367a;
+  margin: 0 0 2px;
+}
+
+.items-stars .star {
   color: grey;
   font-size: 20px;
 }
 
-.hoodie-price {
+.items-price {
   font-size: 32px;
   font-weight: bold;
   color: #DC2626;
   margin-top: 8px;
+  text-align: left;
 }
 
 .see-more {
@@ -230,7 +232,7 @@
   font-size: 14px;
 }
 
-.hoodie-buttons button {
+.items-buttons button {
   display: flex;
   align-items: center;
   gap: 8px;

@@ -15,6 +15,7 @@ export default function Products() {
   const [newProduct, setNewProduct] = useState({ name: '', price: '', description: '', image: null });
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
+  const [expandedDescriptions, setExpandedDescriptions] = useState({});
 
   useEffect(() => {
     fetchProducts();
@@ -172,7 +173,7 @@ export default function Products() {
           </div>
         </div>
       )}
-
+      
       <table className="users-table mt-6">
         <thead>
           <tr>
@@ -228,8 +229,27 @@ export default function Products() {
                       }
                       className="inline-input"
                     />
-                  ) : product.description}
-                </td>
+                  ) : (
+                    <>
+                      {product.description.length > 20 && !expandedDescriptions[product.id]
+                        ? product.description.slice(0, 20) + "..."
+                        : product.description}
+                      {product.description.length > 20 && (
+                        <button
+                          className="see-more-btn"
+                          onClick={() =>
+                            setExpandedDescriptions((prev) => ({
+                              ...prev,
+                              [product.id]: !prev[product.id],
+                            }))
+                          }
+                        >
+                          {expandedDescriptions[product.id] ? " See Less" : " See More"}
+                        </button>
+                      )}
+                    </>
+                  )}
+                </td>  
 
                 <td>
                   {editingProduct?.id === product.id ? (
