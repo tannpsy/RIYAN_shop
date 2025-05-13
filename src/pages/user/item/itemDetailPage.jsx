@@ -54,6 +54,7 @@ const ItemDetails = () => {
   const [userInfoMap, setUserInfoMap] = useState({});
   const [isReviewLoading, setIsReviewLoading] = useState(false);
   const [isAddingReview, setIsAddingReview] = useState(false);
+  const [selectedSentiment, setSelectedSentiment] = useState("ALL");
 
   useEffect(() => {
     const session = localStorage.getItem("user");
@@ -83,8 +84,6 @@ const ItemDetails = () => {
 
     const fetchReviewsWithUsers = async () => {
       setIsReviewLoading(true);
-
-      // ✅ Order reviews by createdAt DESC
       const q = query(
         collection(db, "reviews"),
         where("itemid", "==", itemId),
@@ -93,7 +92,7 @@ const ItemDetails = () => {
       const querySnapshot = await getDocs(q);
       const reviewList = querySnapshot.docs.map((doc) => ({
         ...doc.data(),
-        createdAt: doc.data().createdAt?.toDate() ?? new Date(0), // fallback if missing
+        createdAt: doc.data().createdAt?.toDate() ?? new Date(0),
       }));
       setReviews(reviewList);
 
@@ -134,8 +133,6 @@ const ItemDetails = () => {
       };
 
       await addDoc(collection(db, "reviews"), newReview);
-
-      // Refresh after submit
       setComment("");
       setTimeout(() => {
         window.location.reload();
@@ -161,6 +158,13 @@ const ItemDetails = () => {
   const averageRating = getAverageRating();
   const avgSentiment = getSentimentFromRating(Math.round(averageRating));
   const sentimentColor = getColorBySentiment(avgSentiment);
+
+  const filteredReviews =
+    selectedSentiment === "ALL"
+      ? reviews
+      : reviews.filter(
+          (rev) => rev.sentiment?.toUpperCase() === selectedSentiment
+        );
 
   if (!item) {
     return (
@@ -192,7 +196,10 @@ const ItemDetails = () => {
                     key={idx}
                     className="star"
                     style={{
-                      color: idx < Math.round(averageRating) ? sentimentColor : "#ccc",
+                      color:
+                        idx < Math.round(averageRating)
+                          ? sentimentColor
+                          : "#ccc",
                     }}
                   >
                     ★
@@ -206,7 +213,9 @@ const ItemDetails = () => {
                 | {avgSentiment}
               </span>
             </div>
-            <div className="hoodie-price">{formatRupiah(parseInt(item.price))}</div>
+            <div className="hoodie-price">
+              {formatRupiah(parseInt(item.price))}
+            </div>
 
             <div className="hoodie-description">
               <h2>Product Description</h2>
@@ -250,9 +259,17 @@ const ItemDetails = () => {
           <div className="review-header">
             <h2 className="review-title">Reviews</h2>
             <div className="review-filters">
-              <button className="filter-btn">NEGATIVE</button>
-              <button className="filter-btn">NEUTRAL</button>
-              <button className="filter-btn">POSITIVE</button>
+              {["ALL", "NEGATIVE", "NEUTRAL", "POSITIVE"].map((sentiment) => (
+                <button
+                  key={sentiment}
+                  className={`filter-btn ${
+                    selectedSentiment === sentiment ? "active-filter" : ""
+                  }`}
+                  onClick={() => setSelectedSentiment(sentiment)}
+                >
+                  {sentiment}
+                </button>
+              ))}
             </div>
           </div>
 
@@ -265,7 +282,11 @@ const ItemDetails = () => {
               className="review-input"
               disabled={isAddingReview}
             />
-            <button onClick={handleSubmitComment} className="submit-cmt" disabled={isAddingReview}>
+            <button
+              onClick={handleSubmitComment}
+              className="submit-cmt"
+              disabled={isAddingReview}
+            >
               {isAddingReview ? "Adding..." : "Submit"}
             </button>
           </div>
@@ -274,7 +295,7 @@ const ItemDetails = () => {
             <p className="review-loading">Loading reviews...</p>
           ) : (
             <div className="review-list">
-              {reviews.map((rev, index) => {
+              {filteredReviews.map((rev, index) => {
                 const user = userInfoMap[rev.userid];
                 return (
                   <div className="review-item" key={index}>
@@ -295,6 +316,9 @@ const ItemDetails = () => {
                   </div>
                 );
               })}
+              {filteredReviews.length === 0 && (
+                <p className="no-reviews-msg">No reviews for this filter.</p>
+              )}
             </div>
           )}
         </div>

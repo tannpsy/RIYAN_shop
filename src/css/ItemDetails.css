@@ -320,3 +320,14 @@
   text-align: center;
   color: #888;
 }
+
+.active-filter {
+  background-color: #007bff;
+  color: white;
+  font-weight: bold;
+}
+.no-reviews-msg {
+  color: gray;
+  font-style: italic;
+  padding: 1rem;
+}
