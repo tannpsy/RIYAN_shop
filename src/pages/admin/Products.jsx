@@ -20,23 +20,18 @@ export default function Products() {
     fetchProducts();
   }, []);
 
-  const formatRupiah = (value) => {
-    const number = value.replace(/[^,\d]/g, '').toString();
-    const split = number.split(',');
-    let rupiah = split[0].length % 3;
-    let formatted = split[0].substr(0, rupiah);
-    const thousands = split[0].substr(rupiah).match(/\d{3}/gi);
-
-    if (thousands) {
-      const separator = rupiah ? '.' : '';
-      formatted += separator + thousands.join('.');
-    }
-
-    formatted = split[1] !== undefined ? formatted + ',' + split[1] : formatted;
-    return 'Rp' + formatted;
+  const formatRupiah = (number) => {
+    if (!number) return '';
+    return new Intl.NumberFormat('id-ID', {
+      style: 'currency',
+      currency: 'IDR',
+      minimumFractionDigits: 0
+    }).format(number);
   };
 
-  const unformatRupiah = (value) => value.replace(/[^0-9]/g, '');
+  const unformatRupiah = (value) => {
+    return parseInt(value.replace(/[^\d]/g, '')) || 0;
+  };
 
   const convertToBase64 = (file) => {
     return new Promise((resolve, reject) => {
@@ -59,17 +54,20 @@ export default function Products() {
 
   const addProduct = async () => {
     try {
-      if (!newProduct.name || !newProduct.price || !newProduct.description || !newProduct.image) {
+      const { name, price, description, image } = newProduct;
+
+      if (!name || !price || !description || !image) {
         alert("Please fill all required fields and upload an image.");
         return;
       }
 
-      const imageBase64 = await convertToBase64(newProduct.image);
+      const imageBase64 = await convertToBase64(image);
+      const cleanPrice = unformatRupiah(price);
 
       await addDoc(collection(db, 'items'), {
-        name: newProduct.name.trim(),
-        price: newProduct.price.trim(),
-        description: newProduct.description.trim(),
+        name: name.trim(),
+        price: cleanPrice,
+        description: description.trim(),
         image: imageBase64,
         category: 'Hoodie'
       });
@@ -92,7 +90,7 @@ export default function Products() {
   };
 
   const startEditing = (product) => {
-    setEditingProduct({ ...product, imageFile: null });
+    setEditingProduct({ ...product, price: formatRupiah(product.price), imageFile: null });
   };
 
   const cancelEditing = () => {
@@ -102,7 +100,11 @@ export default function Products() {
   const saveEdit = async () => {
     try {
       const { id, name, price, description, imageFile } = editingProduct;
-      let updateData = { name, price, description };
+      let updateData = {
+        name: name.trim(),
+        price: unformatRupiah(price),
+        description: description.trim()
+      };
 
       if (imageFile) {
         const imageBase64 = await convertToBase64(imageFile);
@@ -213,7 +215,7 @@ export default function Products() {
                       }
                       className="inline-input"
                     />
-                  ) : product.price}
+                  ) : formatRupiah(product.price)}
                 </td>
 
                 <td>

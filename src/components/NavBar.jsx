@@ -1,16 +1,38 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaShoppingCart } from 'react-icons/fa';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../lib/firebase'; // adjust the path as needed
 import '../css/HomePage.css';
 
 const NavBar = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [fullName, setFullName] = useState('');
 
   useEffect(() => {
     const session = localStorage.getItem('user');
     if (session) {
-      setUser(JSON.parse(session));
+      const parsedUser = JSON.parse(session);
+      setUser(parsedUser);
+
+      // Fetch full name from Firestore using uid
+      const fetchFullName = async () => {
+        try {
+          const userDocRef = doc(db, 'users', parsedUser.uid);
+          const userDocSnap = await getDoc(userDocRef);
+          if (userDocSnap.exists()) {
+            const userData = userDocSnap.data();
+            setFullName(userData.fullname);
+          } else {
+            console.log('User document not found');
+          }
+        } catch (error) {
+          console.error('Error fetching user data:', error);
+        }
+      };
+
+      fetchFullName();
     }
   }, []);
 
@@ -45,7 +67,7 @@ const NavBar = () => {
       <div className="header-right">
         {user ? (
           <>
-            <span className="welcome-msg">Hi, {user.username || 'User'}</span>
+            <span className="welcome-msg">Hi, {fullName || 'User'}</span>
             <button className="sign-in" onClick={handleLogout}>Logout</button>
           </>
         ) : (

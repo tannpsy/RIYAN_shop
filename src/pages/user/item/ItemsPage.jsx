@@ -1,30 +1,78 @@
 // src/components/ItemsPage.jsx
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { db } from '../../../lib/firebase';
+import {
+  collection,
+  getDocs,
+  doc,
+  getDoc
+} from 'firebase/firestore';
 import NavBar from '../../../components/NavBar'; 
 import Footer from '../../../components/Footer';
 import '../../../css/ItemsPage.css';
 
-const merchandiseItems = [
-  {
-    id: 'hoodie',
-    title: ['University', 'Hoodie'],
-    image: '/hoodie2.jpg',
-  },
-  {
-    id: 'tshirt',
-    title: ['Campus', 'T-Shirt'],
-    image: '/tshirt2.webp',
-  },
-  {
-    id: 'totebag',
-    title: ['Tote', 'Bag'],
-    image: '/totebag2.webp',
-  },
-];
-
 export default function ItemsPage() {
   const navigate = useNavigate();
+  const [items, setItems] = useState([]);
+  const [userData, setUserData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const session = localStorage.getItem('user');
+
+      if (!session) {
+        navigate('/login');
+        return;
+      }
+
+      const { uid, role } = JSON.parse(session);
+
+      if (role !== 'user') {
+        navigate('/login');
+        return;
+      }
+
+      try {
+        const userDocRef = doc(db, 'users', uid);
+        const userDoc = await getDoc(userDocRef);
+
+        if (!userDoc.exists()) {
+          console.error('User not found in database');
+          navigate('/login');
+          return;
+        }
+
+        setUserData(userDoc.data());
+        fetchMerchandise(); // only fetch items after confirming user
+      } catch (err) {
+        console.error('Failed to fetch user data:', err);
+        navigate('/login');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, [navigate]);
+
+  const fetchMerchandise = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, 'items'));
+      const itemsData = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setItems(itemsData);
+    } catch (error) {
+      console.error("Error fetching merchandise:", error.message);
+    }
+  };
+
+  if (isLoading) {
+    return <div className="loading">Loading...</div>;
+  }
 
   return (
     <>
@@ -36,14 +84,14 @@ export default function ItemsPage() {
         </p>
 
         <div className="items-grid">
-          {merchandiseItems.map((item) => (
+          {items.map((item) => (
             <div key={item.id} className="item-card">
               <div className="item-badge">New</div>
               <h2 className="item-title">
-                <span className="blue-text">{item.title[0]} </span>
-                <span className="red-text">{item.title[1]}</span>
+                <span className="blue-text">{item.name?.split(' ')[0]} </span>
+                <span className="red-text">{item.name?.split(' ').slice(1).join(' ')}</span>
               </h2>
-              <img src={item.image} alt={item.title.join(' ')} className="item-image" />
+              <img src={item.image} alt={item.name} className="item-image" />
               <button className="details-button" onClick={() => navigate(`/items/${item.id}`)}>
                 View Details
               </button>
@@ -51,7 +99,7 @@ export default function ItemsPage() {
           ))}
         </div>
       </div>
-      <Footer/>
+      <Footer />
     </>
   );
 }
