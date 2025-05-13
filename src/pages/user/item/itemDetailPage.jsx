@@ -185,7 +185,7 @@ const ItemDetails = () => {
             <hr className="hoodie-divider1" />
             <hr className="hoodie-divider2" />
             <div className="hoodie-rating">
-              <span className="hoodie-null">{Math.round(averageRating)}★</span>
+              <span className="hoodie-null">{averageRating.toFixed(1)}</span>
               <div className="hoodie-stars">
                 {[...Array(5)].map((_, idx) => (
                   <span
