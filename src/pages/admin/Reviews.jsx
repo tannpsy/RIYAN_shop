@@ -50,7 +50,7 @@ function Reviews() {
               <th>Review ID</th>
               <th>Item ID</th>
               <th>User ID</th>
-              <th>Review / Summary</th>
+              <th>Summary</th>
               <th>Sentiment</th>
             </tr>
           </thead>
