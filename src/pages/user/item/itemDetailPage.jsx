@@ -125,7 +125,7 @@ const ItemDetails = () => {
     setIsAddingReview(true);
     try {
       // Kirim review ke Flask AI API
-      const response = await fetch("http://localhost:5000/api/analyze", {
+      const response = await fetch("https://cb90-180-252-112-13.ngrok-free.app/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ review: comment.trim() }),
