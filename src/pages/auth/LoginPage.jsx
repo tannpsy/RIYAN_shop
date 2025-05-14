@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Mail, Lock } from 'lucide-react';
-import { supabase } from '../../lib/supabase';
+import { auth, db } from '../../lib/firebase';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import '../../css/Auth.css';
@@ -11,6 +13,19 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+
+  // Redirect user if already logged in
+  useEffect(() => {
+    const session = localStorage.getItem('user');
+    if (session) {
+      const { role } = JSON.parse(session);
+      if (role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/home');
+      }
+    }
+  }, [navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -26,18 +41,8 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-        email: formData.email,
-        password: formData.password,
-      });
-
-      if (signInError) {
-        setError(signInError.message);
-        setIsLoading(false);
-        return;
-      }
-
-      const user = signInData.user;
+      const userCredential = await signInWithEmailAndPassword(auth, formData.email, formData.password);
+      const user = userCredential.user;
 
       if (!user) {
         setError('Login failed: no user returned');
@@ -45,19 +50,19 @@ export default function LoginPage() {
         return;
       }
 
-      const { data: userInfo, error: fetchError } = await supabase
-        .from('users')
-        .select('fullname, role')
-        .eq('uid', user.id)
-        .single();
+      const userDocRef = doc(db, 'users', user.uid);
+      const userDoc = await getDoc(userDocRef);
 
-      if (fetchError) {
-        setError('Failed to fetch user info: ' + fetchError.message);
+      if (!userDoc.exists()) {
+        setError('Failed to fetch user info: user not found in database');
         setIsLoading(false);
         return;
       }
 
-      const { fullname, role } = userInfo;
+      const { fullname, role } = userDoc.data();
+
+      // Save session in localStorage
+      localStorage.setItem('user', JSON.stringify({ uid: user.uid, role }));
 
       toast.success(`Welcome, ${fullname}`, {
         position: 'top-center',
@@ -70,15 +75,11 @@ export default function LoginPage() {
       });
 
       setTimeout(() => {
-        if (role === 'admin') {
-          navigate('/admin');
-        } else {
-          navigate('/home');
-        }
+        navigate(role === 'admin' ? '/admin' : '/home');
       }, 1600);
 
     } catch (err) {
-      setError('Unexpected error during login.');
+      setError(err.message || 'Unexpected error during login.');
     }
 
     setIsLoading(false);

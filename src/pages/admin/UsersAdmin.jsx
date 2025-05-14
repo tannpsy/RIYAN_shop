@@ -1,27 +1,26 @@
 import { useEffect, useState } from 'react';
-import { supabase } from '../../lib/supabase'; // Ensure supabase is imported
+import { db } from '../../lib/firebase'; // Import Firebase Firestore instance
+import { collection, getDocs, query, where } from 'firebase/firestore';
 import '../../css/UsersAdmin.css'; // Optional, for styling
 
 export default function UsersAdmin({ setTotalUsers }) {
   const [users, setUsers] = useState([]);
 
-  // Fetch data from the 'users' table
+  // Fetch data from Firestore 'users' collection
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const { data, error } = await supabase
-          .from('users') // Fetch data from 'users' table
-          .select('id, fullname, email, role'); // Select necessary columns
+        const usersRef = collection(db, 'users'); // Reference to 'users' collection
+        const q = query(usersRef, where('role', 'in', ['user'])); // Fetch only users with 'user' role
 
-        if (error) {
-          throw error;
-        }
+        const querySnapshot = await getDocs(q); // Get documents in 'users' collection
+        const usersData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); // Map data to array
 
-        setUsers(data); // Set the users to state
+        setUsers(usersData); // Set users to state
 
         // Update the total user count in AdminDashboard
         if (setTotalUsers) {
-          setTotalUsers(data.length);
+          setTotalUsers(usersData.length);
         }
       } catch (error) {
         console.error("Error fetching users:", error.message);
