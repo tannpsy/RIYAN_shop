@@ -124,19 +124,27 @@ const ItemDetails = () => {
 
     setIsAddingReview(true);
     try {
+      // Kirim review ke Flask AI API
+      const response = await fetch("http://localhost:5000/api/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ review: comment.trim() }),
+      });
+
+      const data = await response.json();
+
       const newReview = {
         itemid: itemId,
         userid: userData.uid,
         review: comment.trim(),
-        sentiment: "positive",
+        sentiment: data.sentiment,
+        summary: data.summary,
         createdAt: serverTimestamp(),
       };
 
       await addDoc(collection(db, "reviews"), newReview);
       setComment("");
-      setTimeout(() => {
-        window.location.reload();
-      }, 300);
+      setTimeout(() => window.location.reload(), 300);
     } catch (err) {
       console.error("Error adding review:", err);
     }
