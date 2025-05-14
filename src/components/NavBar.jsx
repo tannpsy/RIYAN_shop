@@ -11,13 +11,13 @@ const NavBar = () => {
   const [fullName, setFullName] = useState('');
 
   useEffect(() => {
-    // ✅ Reset session ONLY once per app reload in development mode
+    // Reset session ONLY once per app reload in development mode
     if (import.meta.env.DEV && !sessionStorage.getItem('sessionInitialized')) {
       localStorage.removeItem('user');
       sessionStorage.setItem('sessionInitialized', 'true');
     }
 
-    // ✅ Check session and fetch user info
+    // Check session and fetch user info
     const session = localStorage.getItem('user');
     if (session) {
       const parsedUser = JSON.parse(session);
