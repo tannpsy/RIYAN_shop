@@ -27,3 +27,28 @@
 .reviews-table tr:nth-child(even) {
   background-color: #f9f9f9;
 }
+
+/* Tambahkan di Reviews.css jika mau styling elipsis */
+.reviews-table button {
+  font-family: inherit;
+}
+
+.reviews-table .dropdown {
+  position: absolute;
+  right: 0;
+  top: 30px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  min-width: 150px;
+  z-index: 100;
+}
+
+.reviews-table .dropdown button {
+  padding: 8px;
+  width: 100%;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+}
