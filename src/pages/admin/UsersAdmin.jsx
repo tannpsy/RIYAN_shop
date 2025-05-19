@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { db } from '../../lib/firebase'; // Import Firebase Firestore instance
 import { collection, getDocs, query, where } from 'firebase/firestore';
-import '../../css/UsersAdmin.css'; // Optional, for styling
+import '../../css/UsersAdmin.css'; 
 
 export default function UsersAdmin({ setTotalUsers }) {
   const [users, setUsers] = useState([]);

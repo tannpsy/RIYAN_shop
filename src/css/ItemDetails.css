@@ -1,4 +1,4 @@
-/* Container */
+
 .items-container {
   width: 100%;
   max-width: 100%;
@@ -6,7 +6,7 @@
   box-sizing: border-box;
 }
 
-/* Product Section */
+
 .items-product-section {
   display: flex;
   flex-direction: column;
@@ -110,8 +110,6 @@
   font-size: 14px;
 }
 
-
-/* Review Section */
 .items-review-section {
   margin-top: 48px;
 }
@@ -156,8 +154,8 @@
 .review-input-wrapper {
   display: flex;
   align-items: center;
-  gap: 10px; /* jarak antara input dan tombol */
-  width: 100%; /* agar full lebar */
+  gap: 10px; 
+  width: 100%; 
 }
 
 

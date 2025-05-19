@@ -124,7 +124,7 @@ const ItemDetails = () => {
 
     setIsAddingReview(true);
     try {
-      // Kirim review ke Flask AI API
+      // Send review to Flask AI API
       const response = await fetch("https://5974-103-165-225-75.ngrok-free.app/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -258,7 +258,6 @@ const ItemDetails = () => {
           </div>
         </div>
 
-        {/* Review Section */}
         <div className="items-review-section">
           <div className="review-header">
             <h2 className="review-title">Reviews</h2>

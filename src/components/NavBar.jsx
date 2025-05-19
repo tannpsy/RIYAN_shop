@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaShoppingCart } from 'react-icons/fa';
 import { doc, getDoc } from 'firebase/firestore';
-import { db } from '../lib/firebase'; // adjust the path as needed
+import { db } from '../lib/firebase'; 
 import '../css/HomePage.css';
 
 const NavBar = () => {
@@ -23,7 +23,7 @@ const NavBar = () => {
       const parsedUser = JSON.parse(session);
       setUser(parsedUser);
 
-      // ✅ Fetch full name from Firestore
+      // Fetch full name from Firestore
       const fetchFullName = async () => {
         try {
           const userDocRef = doc(db, 'users', parsedUser.uid);

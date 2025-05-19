@@ -1,4 +1,3 @@
-// src/components/ItemsPage.jsx
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { db } from '../../../lib/firebase';
@@ -45,7 +44,7 @@ export default function ItemsPage() {
         }
 
         setUserData(userDoc.data());
-        fetchMerchandise(); // only fetch items after confirming user
+        fetchMerchandise(); // Only fetch items after confirming user
       } catch (err) {
         console.error('Failed to fetch user data:', err);
         navigate('/login');
