@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, doc, getDoc } from "firebase/firestore";
 import { db } from '../../lib/firebase';
 import "../../css/Reviews.css";
 
@@ -11,10 +11,30 @@ function Reviews() {
 
   const fetchReviews = async () => {
     try {
-      const reviewsCol = collection(db, "reviews");
-      const snapshot = await getDocs(reviewsCol);
-      const reviewsData = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      setReviews(reviewsData);
+      const reviewsSnapshot = await getDocs(collection(db, "reviews"));
+
+      const reviewsData = await Promise.all(
+        reviewsSnapshot.docs.map(async (docSnap) => {
+          const data = docSnap.data();
+
+          const itemDoc = await getDoc(doc(db, "items", data.itemid));
+          const userDoc = await getDoc(doc(db, "users", data.userid));
+
+          const itemName = itemDoc.exists() ? itemDoc.data().name : "Unknown Item";
+          const username = userDoc.exists() ? userDoc.data().username : "Unknown User";
+
+          return {
+            id: docSnap.id,
+            ...data,
+            itemName,
+            username,
+            createdAt: new Date(data.createdAt),
+          };
+        })
+      );
+
+      const sorted = reviewsData.sort((a, b) => b.createdAt - a.createdAt);
+      setReviews(sorted);
     } catch (error) {
       console.error("Error fetching reviews:", error);
     } finally {
@@ -48,9 +68,9 @@ function Reviews() {
           <thead>
             <tr>
               <th>Review ID</th>
-              <th>Item ID</th>
-              <th>User ID</th>
-              <th>Summary</th>
+              <th>Item</th>
+              <th>User</th>
+              <th>Summary / Review</th>
               <th>Sentiment</th>
             </tr>
           </thead>
@@ -63,8 +83,8 @@ function Reviews() {
               reviews.map((r) => (
                 <tr key={r.id}>
                   <td>{r.id}</td>
-                  <td>{r.itemid}</td>
-                  <td>{r.userid}</td>
+                  <td>{r.itemName}</td>
+                  <td>{r.username}</td>
                   <td style={{ position: "relative" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start" }}>
                       <span>{showOriginal[r.id] ? r.review : r.summary}</span>
