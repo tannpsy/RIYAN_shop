@@ -125,7 +125,7 @@ const ItemDetails = () => {
     setIsAddingReview(true);
     try {
       // Send review to Flask AI API
-      const response = await fetch("https://5974-103-165-225-75.ngrok-free.app/api/analyze", {
+      const response = await fetch("http://127.0.0.1:5000/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ review: comment.trim() }),

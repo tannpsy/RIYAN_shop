@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { collection, getDocs, doc, getDoc } from "firebase/firestore";
+import { collection, getDocs, doc, getDoc, query, orderBy } from "firebase/firestore";
 import { db } from '../../lib/firebase';
 import "../../css/Reviews.css";
 
@@ -11,7 +11,9 @@ function Reviews() {
 
   const fetchReviews = async () => {
     try {
-      const reviewsSnapshot = await getDocs(collection(db, "reviews"));
+      // Use query with descending order from Firestore
+      const reviewsQuery = query(collection(db, "reviews"), orderBy("createdAt", "desc"));
+      const reviewsSnapshot = await getDocs(reviewsQuery);
 
       const reviewsData = await Promise.all(
         reviewsSnapshot.docs.map(async (docSnap) => {
@@ -33,8 +35,7 @@ function Reviews() {
         })
       );
 
-      const sorted = reviewsData.sort((a, b) => b.createdAt - a.createdAt);
-      setReviews(sorted);
+      setReviews(reviewsData);
     } catch (error) {
       console.error("Error fetching reviews:", error);
     } finally {
