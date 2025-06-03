@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { User, Lock, Mail } from 'lucide-react';
-import { supabase } from '../../lib/supabase';
+import { auth, db, createUserWithEmailAndPassword, updateProfile, setDoc, doc } from '../../lib/firebase';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import '../../css/Auth.css';
@@ -50,57 +50,23 @@ export default function RegisterPage() {
     setIsLoading(true);
 
     try {
-      const { error: signUpError } = await supabase.auth.signUp({
-        email: formData.email,
-        password: formData.password,
-        options: {
-          data: {
-            full_name: formData.fullName,
-            username: formData.username,
-            role: 'user',
-          },
-        },
+      const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
+      const user = userCredential.user;
+
+      // Update display name
+      await updateProfile(user, {
+        displayName: formData.fullName,
       });
 
-      if (signUpError) {
-        setError(
-          signUpError.message.includes('email')
-            ? 'An account with this email already exists.'
-            : signUpError.message
-        );
-        setIsLoading(false);
-        return;
-      }
-
-      const { data: userData } = await supabase.auth.getUser();
-      const user = userData?.user;
-
-      if (!user) {
-        setError('Could not fetch user after registration.');
-        setIsLoading(false);
-        return;
-      }
-
-      const { error: insertError } = await supabase
-        .from('users')
-        .insert([
-          {
-            uid: user.id,
-            email: formData.email,
-            fullname: formData.fullName,
-            username: formData.username,
-            role: 'user',
-            cart: [],
-          },
-        ]);
-
-      if (insertError) {
-        setError('Error saving user data: ' + insertError.message);
-        setIsLoading(false);
-        return;
-      }
-
-      await supabase.auth.signOut();
+      // Save user data to Firestore
+      await setDoc(doc(db, "users", user.uid), {
+        uid: user.uid,
+        email: formData.email,
+        fullname: formData.fullName,
+        username: formData.username,
+        role: 'user',
+        createdAt: new Date().toISOString(),
+      });
 
       toast.success('Account created successfully!', {
         position: 'top-center',
@@ -114,7 +80,10 @@ export default function RegisterPage() {
         onClose: () => navigate('/login'),
       });
     } catch (err) {
-      setError('Unexpected error during registration.');
+      const msg = err.message.includes('email-already-in-use')
+        ? 'An account with this email already exists.'
+        : 'Error creating account: ' + err.message;
+      setError(msg);
     }
 
     setIsLoading(false);

@@ -1,11 +1,9 @@
-/* Layout utama */
 .dashboard-layout {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
 }
 
-/* Top navbar */
 .top-navbar {
   display: flex;
   justify-content: space-between;
@@ -18,7 +16,7 @@
 }
 
 .top-navbar .logo-img {
-  height: 100px;
+  height: 70px;
   weight: 100px;
   margin-left: 30px;
 }
@@ -49,15 +47,13 @@
   background-color: #dc2626;
 }
 
-/* Wrapper untuk sidebar dan konten utama */
 .main-wrapper {
   display: flex;
   flex: 1;
-  min-height: calc(100vh - 64px); /* dikurangi tinggi navbar */
+  min-height: calc(100vh - 64px);
   background-color: #f9fafb;
 }
 
-/* Sidebar */
 .sidebar {
   width: 190px;
   background-color: #1e3a8a;
@@ -87,10 +83,8 @@
   background-color: #3b82f6;
 }
 
-/* Main content */
 .dashboard-container {
   flex: 1;
-  padding: 2rem;
 }
 
 .dashboard-card {
@@ -113,7 +107,6 @@
   margin: 0;
 }
 
-/* Dashboard statistics */
 .dashboard-stats {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
@@ -147,7 +140,6 @@
   color: #1e3a8a;
 }
 
-/* Admin controls section */
 .admin-controls {
   background-color: white;
   padding: 1.5rem;
@@ -183,7 +175,6 @@
   background-color: #1e40af;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .top-navbar {
     flex-direction: column;
@@ -225,7 +216,7 @@
   align-items: flex-start;
   gap: 2rem;
   margin-bottom: 2rem;
-  flex-wrap: wrap; /* Optional: helps with responsiveness */
+  flex-wrap: wrap; 
 }
 
 .fixed-width {
@@ -233,7 +224,6 @@
   max-width: 300px;
 }
 
-/* Flex helper */
 .dashboard-header-row {
   display: flex;
   justify-content: space-between;
@@ -252,7 +242,6 @@
   flex: 1;
 }
 
-/* User Table inside Dashboard */
 .users-table {
   width: 100%;
   border-collapse: collapse;
